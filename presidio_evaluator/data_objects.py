@@ -573,7 +573,7 @@ class InputSample(object):
         return input_samples
 
     @classmethod
-    def convert_faker_spans(fake_records: List[FakerSpansResult]) -> List["InputSample"]:
+    def convert_faker_spans(cls, fake_records: List[FakerSpansResult]) -> List["InputSample"]:
         """tokenize and transform fake samples to list of InputSample objects (data structure in presidio)"""
         input_samples = [
             InputSample.from_faker_spans_result(faker_spans_result=fake_record)
