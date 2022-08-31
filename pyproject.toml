@@ -6,17 +6,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "privy-presidio-utils"
-version = "0.0.1"
+version = "0.0.2"
 description = "Read the latest Real Python tutorials"
 readme = "README.md"
-authors = [{ name = "Real Python", email = "info@realpython.com" }]
 license = { file = "LICENSE" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-keywords = ["privy", "nlp", "pii"]
+keywords = ["nlp", "pii"]
 dependencies = [
     "spacy>=3.2.0",
     "numpy>=1.20.2",

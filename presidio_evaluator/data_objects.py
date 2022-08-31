@@ -572,14 +572,16 @@ class InputSample(object):
 
         return input_samples
 
-    def count_entities(self, input_samples: List["InputSample"]) -> Counter:
+    @classmethod
+    def count_entities(cls, input_samples: List["InputSample"]) -> Counter:
         count_per_entity_new = Counter()
         for record in input_samples:
             for span in record.spans:
                 count_per_entity_new[span.entity_type] += 1
         return count_per_entity_new.most_common()
 
-    def remove_unsupported_entities(self, dataset: List["InputSample"], entity_mapping: Dict[str, str]) -> None:
+    @classmethod
+    def remove_unsupported_entities(cls, dataset: List["InputSample"], entity_mapping: Dict[str, str]) -> None:
         """Remove records with unsupported entities using passed in entity mapping translator."""
         filtered_records = []
         excluded_entities = set()
