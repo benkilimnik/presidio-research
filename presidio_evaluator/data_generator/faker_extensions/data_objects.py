@@ -56,7 +56,7 @@ class FakerSpansResult:
         return cls(**json_dict)
 
     @classmethod
-    def count_span_result_entities(cls, fake_records: List["FakerSpansResult"]) -> Counter:
+    def count_entities(cls, fake_records: List["FakerSpansResult"]) -> Counter:
         count_per_entity_new = Counter()
         for record in fake_records:
             for span in record.spans:
