@@ -4,6 +4,7 @@ from presidio_analyzer import AnalyzerEngine
 
 from presidio_evaluator import InputSample, span_to_tag
 from presidio_evaluator.models import BaseModel
+from presidio_evaluator.data_objects import PRIVY_PRESIDIO_TRANSLATOR
 
 
 class PresidioAnalyzerWrapper(BaseModel):
@@ -15,7 +16,7 @@ class PresidioAnalyzerWrapper(BaseModel):
         labeling_scheme: str = "BIO",
         score_threshold: float = 0.4,
         language: str = "en",
-        entity_mapping: Optional[Dict[str, str]] = None,
+        entity_mapping: Optional[Dict[str, str]] = PRIVY_PRESIDIO_TRANSLATOR,
     ):
         """
         Evaluation wrapper for the Presidio Analyzer

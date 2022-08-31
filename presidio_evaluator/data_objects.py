@@ -16,6 +16,112 @@ from presidio_evaluator.data_generator.faker_extensions import (
     FakerSpan,
 )
 
+PRIVY_ENTITIES = {
+    "person": "PERSON",
+    "name_male": "PERSON",
+    "name_female": "PERSON",
+    "first_name": "PERSON",
+    "first_name_male": "PERSON",
+    "first_name_female": "PERSON",
+    "first_name_nonbinary": "PERSON",
+    "last_name": "PERSON",
+    "last_name_male": "PERSON",
+    "last_name_female": "PERSON",
+
+    "nationality": "NRP",
+    "nation_woman": "NRP",
+    "nation_man": "NRP",
+    "nation_plural": "NRP",
+    "religion": "NRP",
+
+    "address": "STREET_ADDRESS",
+    "street_address": "STREET_ADDRESS",
+    "postcode": "STREET_ADDRESS",
+    "building_number": "STREET_ADDRESS",
+    "street_name": "STREET_ADDRESS",
+    "airport_name": "STREET_ADDRESS",
+    "airport_iata": "STREET_ADDRESS",
+    "airport_icao": "STREET_ADDRESS",
+
+    "coordinate": "LOCATION",
+    "longitude": "LOCATION",
+    "latitude": "LOCATION",
+
+    "country": "GPE",
+    "country_code": "GPE",
+    "state": "GPE",
+    "city": "GPE",
+    "state_abbr": "GPE",
+
+    "date_time": "DATE_TIME",
+    "date_of_birth": "DATE_TIME",
+    "day_of_week": "DATE_TIME",
+    "year": "DATE_TIME",
+    "month": "DATE_TIME",
+
+    "job": "TITLE",
+    "prefix": "TITLE",
+    "prefix_male": "TITLE",
+    "prefix_female": "TITLE",
+    "gender": "TITLE",
+
+    "credit_card_number": "CREDIT_CARD",
+    "credit_card_expire": "CREDIT_CARD",
+
+    "organization": "ORGANIZATION",
+    "company": "ORGANIZATION",
+    "airline": "ORGANIZATION",
+
+    "url": "URL",
+    "domain_name": "URL",
+
+    "iban": "IBAN_CODE",
+    "bban": "US_BANK_NUMBER",
+    "phone_number": "PHONE_NUMBER",
+    "ssn": "US_SSN",
+    "passport": "US_PASSPORT",
+    "driver_license": "US_DRIVER_LICENSE",
+    "ip_address": "IP_ADDRESS",
+    "mac_address": "MAC_ADDRESS",
+    "imei": "IMEI",
+    "password": "PASSWORD",
+    "license_plate": "LICENSE_PLATE",
+    "currency_code": "CURRENCY",
+    "aba": "ROUTING_NUMBER",
+    "swift": "SWIFT_CODE",
+    "email": "EMAIL_ADDRESS",
+    "age": "AGE",
+}
+
+PRIVY_PRESIDIO_TRANSLATOR = {
+    "PERSON": "PERSON",
+    "NRP": "NRP",
+    "STREET_ADDRESS": "LOCATION",
+    "LOCATION": "LOCATION",
+    "GPE": "LOCATION",
+    "DATE_TIME": "DATE_TIME",
+    "CREDIT_CARD": "CREDIT_CARD",
+    "URL": "URL",
+    "IBAN_CODE": "IBAN_CODE",
+    "US_BANK_NUMBER": "US_BANK_NUMBER",
+    "PHONE_NUMBER": "PHONE_NUMBER",
+    "US_SSN": "US_SSN",
+    "US_PASSPORT": "US_PASSPORT",
+    "US_DRIVER_LICENSE": "US_DRIVER_LICENSE",
+    "IP_ADDRESS": "IP_ADDRESS",
+    "EMAIL_ADDRESS": "EMAIL_ADDRESS",
+}
+
+PRIVY_ONTONOTES_TRANSLATOR = {
+    "PERSON": "PERSON",
+    "NRP": "NORP",
+    "STREET_ADDRESS": "FAC",
+    "LOCATION": "LOC",
+    "GPE": "GPE",
+    "DATE_TIME": "DATE",
+    "ORGANIZATION": "ORG",
+}
+
 SPACY_PRESIDIO_ENTITIES = {
     "ORG": "ORGANIZATION",
     "NORP": "NRP",
@@ -28,6 +134,7 @@ SPACY_PRESIDIO_ENTITIES = {
     "DATE": "DATE_TIME",
     "TIME": "DATE_TIME",
 }
+
 PRESIDIO_SPACY_ENTITIES = {
     "PERSON": "PERSON",
     "LOCATION": "LOC",

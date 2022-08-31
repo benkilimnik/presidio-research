@@ -3,6 +3,7 @@ from typing import List, Dict
 import spacy
 
 from presidio_evaluator.data_objects import PRESIDIO_SPACY_ENTITIES
+from presidio_evaluator.data_objects import PRIVY_ONTONOTES_TRANSLATOR
 
 try:
     from flair.data import Sentence
@@ -31,7 +32,7 @@ class FlairModel(BaseModel):
         model_path: str = None,
         entities_to_keep: List[str] = None,
         verbose: bool = False,
-        entity_mapping: Dict[str, str] = PRESIDIO_SPACY_ENTITIES,
+        entity_mapping: Dict[str, str] = PRIVY_ONTONOTES_TRANSLATOR,
     ):
 
         super().__init__(
