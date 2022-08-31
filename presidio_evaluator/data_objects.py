@@ -573,6 +573,15 @@ class InputSample(object):
         return input_samples
 
     @classmethod
+    def convert_faker_spans(fake_records: List[FakerSpansResult]) -> List["InputSample"]:
+        """tokenize and transform fake samples to list of InputSample objects (data structure in presidio)"""
+        input_samples = [
+            InputSample.from_faker_spans_result(faker_spans_result=fake_record)
+            for fake_record in tqdm.tqdm(fake_records)
+        ]
+        return input_samples
+
+    @classmethod
     def count_entities(cls, input_samples: List["InputSample"]) -> Counter:
         count_per_entity_new = Counter()
         for record in input_samples:

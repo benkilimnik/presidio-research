@@ -173,12 +173,12 @@ class FlairTrainer:
         print(tag_dictionary)
 
         # 4. initialize fine-tuneable transformer embeddings WITH document context
-        embeddings = TransformerWordEmbeddings(model='xlm-roberta-large',
-                                               layers="-1",
-                                               subtoken_pooling="first",
-                                               fine_tune=True,
-                                               use_context=True,
-                                               )
+        embedding_types = TransformerWordEmbeddings(model='xlm-roberta-large',
+                                                    layers="-1",
+                                                    subtoken_pooling="first",
+                                                    fine_tune=True,
+                                                    use_context=True,
+                                                    )
 
         embeddings: StackedEmbeddings = StackedEmbeddings(embeddings=embedding_types)
 
@@ -223,4 +223,4 @@ if __name__ == "__main__":
     trainer.create_flair_corpus(train_samples, test_samples, val_samples)
 
     corpus = trainer.read_corpus("")
-    trainer.train(corpus)
+    trainer.train_with_flair_embeddings(corpus)

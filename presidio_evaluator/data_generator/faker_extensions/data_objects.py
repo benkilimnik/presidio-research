@@ -62,3 +62,9 @@ class FakerSpansResult:
             for span in record.spans:
                 count_per_entity_new[span.type] += 1
         return count_per_entity_new.most_common()
+
+    @classmethod
+    def load_privy_dataset(cls, filename: str) -> List["FakerSpansResult"]:
+        """Load a dataset of FakerSpansResult from a JSON file."""
+        with open(filename, "r", encoding="utf-8") as f:
+            return [cls.fromJSON(line) for line in f.readlines()]
