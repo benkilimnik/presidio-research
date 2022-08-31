@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "privy-presidio-utils"
-version = "0.0.9"
+version = "0.0.10"
 description = "Read the latest Real Python tutorials"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -26,8 +26,6 @@ dependencies = [
     "faker>=9.6.0",
     "scikit_learn",
     "flair",
-    "stanza",
-    "spacy_stanza",
     "sklearn_crfsuite",
     "pytest>=6.2.3",
     "presidio_analyzer",
