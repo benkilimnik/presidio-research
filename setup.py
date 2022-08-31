@@ -4,19 +4,17 @@ import os.path
 # read the contents of the README file
 from os import path
 
-this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
-    long_description = f.read()
-    # print(long_description)
+# this_directory = path.abspath(path.dirname(__file__))
+# with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
+#     long_description = f.read()
+#     # print(long_description)
 
-with open(os.path.join(this_directory, "VERSION")) as version_file:
-    __version__ = version_file.read().strip()
+# with open(os.path.join(this_directory, "VERSION")) as version_file:
+#     __version__ = version_file.read().strip()
 
 setup(
     name="presidio-evaluator",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    version=__version__,
+    version="0.0.1",
     packages=find_packages(exclude=["tests"]),
     url="https://www.github.com/microsoft/presidio-research",
     license="MIT",

@@ -8,6 +8,7 @@ from spacy import Language
 from spacy.tokens import Doc, DocBin
 from spacy.training import iob_to_biluo
 from tqdm import tqdm
+from collections import Counter
 
 from presidio_evaluator import span_to_tag, tokenize
 from presidio_evaluator.data_generator.faker_extensions import (
@@ -570,3 +571,27 @@ class InputSample(object):
         ]
 
         return input_samples
+
+    def count_entities(self, input_samples: List["InputSample"]) -> Counter:
+        count_per_entity_new = Counter()
+        for record in input_samples:
+            for span in record.spans:
+                count_per_entity_new[span.entity_type] += 1
+        return count_per_entity_new.most_common()
+
+    def remove_unsupported_entities(self, dataset: List["InputSample"], entity_mapping: Dict[str, str]) -> None:
+        """Remove records with unsupported entities using passed in entity mapping translator."""
+        filtered_records = []
+        excluded_entities = set()
+
+        for sample in dataset:
+            supported = True
+            for span in sample.spans:
+                if not span.entity_type in entity_mapping.keys():
+                    supported = False
+                    if span.entity_type not in excluded_entities:
+                        print(f"Filtering out unsupported entity {span.entity_type}")
+                    excluded_entities.add(span.entity_type)
+            if supported:
+                filtered_records.append(sample)
+        dataset = filtered_records

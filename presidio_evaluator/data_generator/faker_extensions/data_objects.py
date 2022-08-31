@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import dataclasses
 import json
 from typing import Optional, List
+from collections import Counter
 
 
 @dataclass(eq=True)
@@ -43,3 +44,21 @@ class FakerSpansResult:
                 "template_id": self.template_id,
             }
         )
+
+    @classmethod
+    def fromJSON(cls, json_string):
+        """Load a single FakerSpansResult from a JSON string."""
+        json_dict = json.loads(json_string)
+        converted_spans = []
+        for span_dict in json.loads(json_dict['spans']):
+            converted_spans.append(FakerSpan(**span_dict))
+        json_dict['spans'] = converted_spans
+        return cls(**json_dict)
+
+
+def count_span_result_entities(fake_records: List[FakerSpansResult]) -> Counter:
+    count_per_entity_new = Counter()
+    for record in fake_records:
+        for span in record.spans:
+            count_per_entity_new[span.type] += 1
+    return count_per_entity_new.most_common()
