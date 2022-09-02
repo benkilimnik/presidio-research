@@ -2,7 +2,6 @@ from typing import List, Dict
 
 import spacy
 
-from presidio_evaluator.data_objects import PRESIDIO_SPACY_ENTITIES
 from presidio_evaluator.data_objects import PRIVY_ONTONOTES_TRANSLATOR
 
 try:
@@ -57,7 +56,7 @@ class FlairModel(BaseModel):
         ents = sentence.get_spans("ner")
         if ents:
             tags, texts, start, end = zip(
-                *[(ent.tag, ent.text, ent.start_pos, ent.end_pos) for ent in ents]
+                *[(ent.tag, ent.text, ent.start_position, ent.end_position) for ent in ents]
             )
 
             tags = [

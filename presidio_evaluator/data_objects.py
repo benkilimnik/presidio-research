@@ -43,9 +43,9 @@ PRIVY_ENTITIES = {
     "airport_iata": "STREET_ADDRESS",
     "airport_icao": "STREET_ADDRESS",
 
-    "coordinate": "LOCATION",
-    "longitude": "LOCATION",
-    "latitude": "LOCATION",
+    "coordinate": "COORDINATE",
+    "longitude": "COORDINATE",
+    "latitude": "COORDINATE",
 
     "country": "GPE",
     "country_code": "GPE",
@@ -116,7 +116,6 @@ PRIVY_ONTONOTES_TRANSLATOR = {
     "PERSON": "PERSON",
     "NRP": "NORP",
     "STREET_ADDRESS": "FAC",
-    "LOCATION": "LOC",
     "GPE": "GPE",
     "DATE_TIME": "DATE",
     "ORGANIZATION": "ORG",
