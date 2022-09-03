@@ -145,7 +145,6 @@ class Evaluator:
             print(
                 f"Mapping entity values using this dictionary: {self.model.entity_mapping}"
             )
-            print(f"Entity counts after mapping: {InputSample.count_entities(dataset)}")
         for sample in tqdm(dataset, desc=f"Evaluating {self.model.__class__}"):
 
             # Align tag values to the ones expected by the model
@@ -164,6 +163,7 @@ class Evaluator:
                 sample=sample, prediction=prediction
             )
             evaluation_results.append(evaluation_result)
+        print(f"Entity counts after mapping: {InputSample.count_entities(dataset)}")
 
         return evaluation_results
 

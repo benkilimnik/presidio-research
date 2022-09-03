@@ -112,17 +112,16 @@ class FlairTrainer:
         tag_type = "ner"
 
         # 3. make the tag dictionary from the corpus
-        tag_dictionary = corpus.make_label_dictionary(label_type=tag_type)
+        tag_dictionary = corpus.make_label_dictionary(
+            label_type=tag_type, add_unk=False)
         print(tag_dictionary)
 
         # 4. initialize embeddings
-        embedding_types: List[TokenEmbeddings] = [
+        embeddings: List[TokenEmbeddings] = [
             WordEmbeddings("glove"),
             FlairEmbeddings("news-forward"),
             FlairEmbeddings("news-backward"),
         ]
-
-        embeddings: StackedEmbeddings = StackedEmbeddings(embeddings=embedding_types)
 
         # 5. initialize sequence tagger
         tagger: SequenceTagger = SequenceTagger(
@@ -138,7 +137,7 @@ class FlairTrainer:
 
         # trainer = ModelTrainer.load_checkpoint(checkpoint, corpus)
         trainer.train(
-            "resources/taggers/presidio-ner",
+            "resources/taggers/privy-flert-ner",
             learning_rate=0.1,
             mini_batch_size=32,
             max_epochs=150,
@@ -169,18 +168,17 @@ class FlairTrainer:
         tag_type = "ner"
 
         # 3. make the tag dictionary from the corpus
-        tag_dictionary = corpus.make_label_dictionary(label_type=tag_type)
+        tag_dictionary = corpus.make_label_dictionary(
+            label_type=tag_type, add_unk=False)
         print(tag_dictionary)
 
         # 4. initialize fine-tuneable transformer embeddings WITH document context
-        embedding_types = TransformerWordEmbeddings(model='xlm-roberta-large',
-                                                    layers="-1",
-                                                    subtoken_pooling="first",
-                                                    fine_tune=True,
-                                                    use_context=True,
-                                                    )
-
-        embeddings: StackedEmbeddings = StackedEmbeddings(embeddings=embedding_types)
+        embeddings = TransformerWordEmbeddings(model='xlm-roberta-large',
+                                               layers="-1",
+                                               subtoken_pooling="first",
+                                               fine_tune=True,
+                                               use_context=True,
+                                               )
 
         # 5. initialize bare-bones sequence tagger (no CRF, no RNN, no reprojection)
         tagger = SequenceTagger(hidden_size=256,
@@ -196,7 +194,7 @@ class FlairTrainer:
         trainer: ModelTrainer = ModelTrainer(tagger, corpus)
 
         # 7. run fine-tuning
-        trainer.fine_tune('resources/taggers/sota-ner-flert',
+        trainer.fine_tune('resources/taggers/privy-flair-transformers-ner',
                           learning_rate=5.0e-6,
                           mini_batch_size=4,
                           mini_batch_chunk_size=1,  # remove this parameter to speed up computation if you have a big GPU
