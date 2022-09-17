@@ -10,11 +10,10 @@ try:
         WordEmbeddings,
         StackedEmbeddings,
         FlairEmbeddings,
-        BertEmbeddings,
+        TransformerWordEmbeddings,
     )
     from flair.models import SequenceTagger
     from flair.trainers import ModelTrainer
-    from flair.embeddings import TransformerWordEmbeddings
 
 except ImportError:
     print("Flair is not installed")
@@ -96,6 +95,7 @@ class FlairTrainer:
             train_file="flair_train.txt",
             test_file="flair_val.txt",
             dev_file="flair_test.txt",
+            in_memory=False,
         )
         return corpus
 
