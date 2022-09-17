@@ -722,4 +722,4 @@ class InputSample(object):
                     excluded_entities.add(span.entity_type)
             if supported:
                 filtered_records.append(sample)
-        dataset = filtered_records
+        return filtered_records
