@@ -34,7 +34,9 @@ class FlairTrainer:
         Turn text, part of speech and label into one row.
         :return: str
         """
+        #  note: remove part of speech tag (pos) from the row because nonsensical for protocol trace data?
         return "{} {} {}".format(text, pos, label)
+        # return "{} {}".format(text, label)
 
     def to_flair(self, df: pd.DataFrame, outfile: str = "flair_train.txt") -> None:
         """Translate a pd.DataFrame to a flair dataset."""
@@ -46,6 +48,7 @@ class FlairTrainer:
                 flair.append("")
             else:
                 flair.append(self.to_flair_row(row.text, row.pos, row.label))
+                # flair.append(self.to_flair_row(row.text, row.label))
 
         if outfile:
             with open(outfile, "w", encoding="utf-8") as f:
@@ -89,6 +92,7 @@ class FlairTrainer:
         :return: Corpus object
         """
         columns = {0: "text", 1: "pos", 2: "ner"}
+        # columns = {0: "text", 1: "ner"}
         corpus = ColumnCorpus(
             data_folder,
             columns,
@@ -112,8 +116,9 @@ class FlairTrainer:
         tag_type = "ner"
 
         # 3. make the tag dictionary from the corpus
-        tag_dictionary = corpus.make_label_dictionary(
-            label_type=tag_type, add_unk=False)
+        tag_dictionary = corpus.make_label_dictionary(label_type=tag_type)
+        # tag_dictionary = corpus.make_label_dictionary(
+        #     label_type=tag_type, add_unk=False)
         print(tag_dictionary)
 
         # 4. initialize embeddings
@@ -170,8 +175,9 @@ class FlairTrainer:
         tag_type = "ner"
 
         # 3. make the tag dictionary from the corpus
-        tag_dictionary = corpus.make_label_dictionary(
-            label_type=tag_type, add_unk=False)
+        tag_dictionary = corpus.make_label_dictionary(label_type=tag_type)
+        # tag_dictionary = corpus.make_label_dictionary(
+        #     label_type=tag_type, add_unk=False)
         print(tag_dictionary)
 
         # 4. initialize fine-tuneable transformer embeddings WITH document context
