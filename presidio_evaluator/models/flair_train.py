@@ -104,7 +104,7 @@ class FlairTrainer:
         return corpus
 
     @staticmethod
-    def train_with_flair_embeddings(corpus):
+    def train_with_flair_embeddings(corpus, add_unk=False):
         """
         Train a Flair model
         :param corpus: Corpus object
@@ -116,9 +116,11 @@ class FlairTrainer:
         tag_type = "ner"
 
         # 3. make the tag dictionary from the corpus
-        tag_dictionary = corpus.make_label_dictionary(label_type=tag_type)
-        # tag_dictionary = corpus.make_label_dictionary(
-        #     label_type=tag_type, add_unk=False)
+        if add_unk:
+            tag_dictionary = corpus.make_label_dictionary(label_type=tag_type)
+        else:
+            tag_dictionary = corpus.make_label_dictionary(
+                label_type=tag_type, add_unk=False)
         print(tag_dictionary)
 
         # 4. initialize embeddings
@@ -163,7 +165,7 @@ class FlairTrainer:
             print(entity)
 
     @staticmethod
-    def train_with_transformers(corpus):
+    def train_with_transformers(corpus, add_unk=False):
         """
         Train a Flair model
         :param corpus: Corpus object
@@ -175,9 +177,11 @@ class FlairTrainer:
         tag_type = "ner"
 
         # 3. make the tag dictionary from the corpus
-        tag_dictionary = corpus.make_label_dictionary(label_type=tag_type)
-        # tag_dictionary = corpus.make_label_dictionary(
-        #     label_type=tag_type, add_unk=False)
+        if add_unk:
+            tag_dictionary = corpus.make_label_dictionary(label_type=tag_type)
+        else:
+            tag_dictionary = corpus.make_label_dictionary(
+                label_type=tag_type, add_unk=False)
         print(tag_dictionary)
 
         # 4. initialize fine-tuneable transformer embeddings WITH document context
