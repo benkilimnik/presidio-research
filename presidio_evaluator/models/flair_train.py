@@ -113,7 +113,7 @@ class FlairTrainer:
 
         # 3. make the tag dictionary from the corpus
         tag_dictionary = corpus.make_label_dictionary(
-            label_type=tag_type)
+            label_type=tag_type, add_unk=False)
         print(tag_dictionary)
 
         # 4. initialize embeddings
@@ -171,7 +171,7 @@ class FlairTrainer:
 
         # 3. make the tag dictionary from the corpus
         tag_dictionary = corpus.make_label_dictionary(
-            label_type=tag_type)
+            label_type=tag_type, add_unk=False)
         print(tag_dictionary)
 
         # 4. initialize fine-tuneable transformer embeddings WITH document context
@@ -197,11 +197,16 @@ class FlairTrainer:
         # 6. initialize trainer
         trainer: ModelTrainer = ModelTrainer(tagger, corpus)
 
+        # from torch.optim.lr_scheduler import OneCycleLR
+
         # 7. run fine-tuning
         trainer.fine_tune('resources/taggers/privy-flair-transformers',
                           learning_rate=5.0e-6,
                           mini_batch_size=4,
+                          max_epochs=20,
+                          #   scheduler=OneCycleLR,
                           mini_batch_chunk_size=1,  # remove this parameter to speed up computation if you have a big GPU
+                          #   weight_decay=0.,
                           )
 
         sentence = Sentence("I am from Jerusalem")
