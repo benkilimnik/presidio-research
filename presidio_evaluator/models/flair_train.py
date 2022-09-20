@@ -2,6 +2,8 @@ from typing import List
 
 import pandas as pd
 
+from presidio_evaluator.data_generator.faker_extensions.data_objects import FakerSpansResult
+
 try:
     from flair.data import Corpus, Sentence
     from flair.datasets import ColumnCorpus
@@ -66,22 +68,26 @@ class FlairTrainer:
         :return:
         """
         if not path.exists("flair_train.txt"):
-            train_samples = InputSample.read_dataset_json(train_samples_path)
+            # train_samples = InputSample.read_dataset_json(train_samples_path)
+            train_samples = FakerSpansResult.load_privy_dataset(train_samples_path)
             train_tagged = [sample for sample in train_samples if len(sample.spans) > 0]
             print(
                 f"Kept {len(train_tagged)} train samples after removal of non-tagged samples"
             )
-            train_data = InputSample.create_conll_dataset(train_tagged, to_bio=to_bio)
+            train_data = InputSample.create_conll_dataset(
+                train_tagged, to_bio=to_bio, translate_tags=True)
             self.to_flair(train_data, outfile="flair_train.txt")
 
         if not path.exists("flair_test.txt"):
-            test_samples = InputSample.read_dataset_json(test_samples_path)
-            test_data = InputSample.create_conll_dataset(test_samples, to_bio=to_bio)
+            test_samples = FakerSpansResult.load_privy_dataset(test_samples_path)
+            test_data = InputSample.create_conll_dataset(
+                test_samples, to_bio=to_bio, translate_tags=True)
             self.to_flair(test_data, outfile="flair_test.txt")
 
         if not path.exists("flair_val.txt"):
-            val_samples = InputSample.read_dataset_json(val_samples_path)
-            val_data = InputSample.create_conll_dataset(val_samples, to_bio=to_bio)
+            val_samples = FakerSpansResult.load_privy_dataset(val_samples_path)
+            val_data = InputSample.create_conll_dataset(
+                val_samples, to_bio=to_bio, translate_tags=True)
             self.to_flair(val_data, outfile="flair_val.txt")
 
     @staticmethod

@@ -371,7 +371,7 @@ class InputSample(object):
         for i, token in enumerate(self.tokens):
             if translate_tags:
                 label = self.translate_tag(
-                    self.tags[i], PRESIDIO_SPACY_ENTITIES, ignore_unknown=True
+                    self.tags[i], PRIVY_ENTITIES, ignore_unknown=True
                 )
             else:
                 label = self.tags[i]
