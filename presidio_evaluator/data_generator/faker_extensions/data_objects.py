@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import dataclasses
 import json
-from typing import Optional, List
+from typing import Optional, List, Dict
 from collections import Counter
 
 
@@ -68,3 +68,15 @@ class FakerSpansResult:
         """Load a dataset of FakerSpansResult from a JSON file."""
         with open(filename, "r", encoding="utf-8") as f:
             return [cls.fromJSON(line) for line in f.readlines()]
+
+    @classmethod
+    def update_entity_types(cls, dataset: List["FakerSpansResult"], entity_mapping: Dict[str, str]):
+        """Replace entity types using a translator dictionary."""
+        for sample in dataset:
+            # update entity types on spans
+            for span in sample.spans:
+                span.type = entity_mapping[span.type]
+            # update entity types on the template string
+            for key, value in entity_mapping.items():
+                sample.template = sample.template.replace(
+                    "{{" + key + "}}", "{{" + value + "}}")

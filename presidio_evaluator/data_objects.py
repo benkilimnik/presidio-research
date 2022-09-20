@@ -332,6 +332,8 @@ class InputSample(object):
             "full_text": self.full_text,
             "masked": self.masked,
             "spans": [span.__dict__ for span in self.spans],
+            "tags": self.tags,
+            # "tokens": self.tokens.to_dict(),
             "template_id": self.template_id,
             "metadata": self.metadata,
         }
