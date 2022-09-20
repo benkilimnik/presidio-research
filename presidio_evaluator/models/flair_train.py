@@ -56,7 +56,7 @@ class FlairTrainer:
                     f.write("{}\n".format(item))
 
     def create_flair_corpus(
-        self, train_samples_path, test_samples_path, val_samples_path
+        self, train_samples_path, test_samples_path, val_samples_path, to_bio=False
     ):
         """
         Create a flair Corpus object and saive it to train, test, validation files.
@@ -71,17 +71,17 @@ class FlairTrainer:
             print(
                 f"Kept {len(train_tagged)} train samples after removal of non-tagged samples"
             )
-            train_data = InputSample.create_conll_dataset(train_tagged)
+            train_data = InputSample.create_conll_dataset(train_tagged, to_bio=to_bio)
             self.to_flair(train_data, outfile="flair_train.txt")
 
         if not path.exists("flair_test.txt"):
             test_samples = InputSample.read_dataset_json(test_samples_path)
-            test_data = InputSample.create_conll_dataset(test_samples)
+            test_data = InputSample.create_conll_dataset(test_samples, to_bio=to_bio)
             self.to_flair(test_data, outfile="flair_test.txt")
 
         if not path.exists("flair_val.txt"):
             val_samples = InputSample.read_dataset_json(val_samples_path)
-            val_data = InputSample.create_conll_dataset(val_samples)
+            val_data = InputSample.create_conll_dataset(val_samples, to_bio=to_bio)
             self.to_flair(val_data, outfile="flair_val.txt")
 
     @staticmethod
@@ -150,8 +150,7 @@ class FlairTrainer:
             "resources/taggers/privy-flert-ner",
             learning_rate=0.1,
             mini_batch_size=32,
-            # max_epochs=150,
-            max_epochs=1,
+            max_epochs=150,
             checkpoint=True,
         )
 
