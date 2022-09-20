@@ -395,6 +395,7 @@ class InputSample(object):
     def create_conll_dataset(
         dataset: Union[List["InputSample"], List[FakerSpansResult]],
         translate_tags=False,
+        # translator=PRIVY_ENTITIES,
         to_bio=True,
         token_model_version="en_core_web_sm"
     ) -> pd.DataFrame:
@@ -693,7 +694,10 @@ class InputSample(object):
     def convert_faker_spans(cls, fake_records: List[FakerSpansResult]) -> List["InputSample"]:
         """tokenize and transform fake samples to list of InputSample objects (data structure in presidio)"""
         input_samples = [
-            InputSample.from_faker_spans_result(faker_spans_result=fake_record)
+            # InputSample.from_faker_spans_result(faker_spans_result=fake_record)
+            InputSample.from_faker_spans_result(
+                fake_record, create_tags_from_span=True, scheme="BILUO", token_model_version="en_core_web_sm"
+            )
             for fake_record in tqdm(fake_records)
         ]
         return input_samples
