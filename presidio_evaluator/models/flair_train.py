@@ -74,7 +74,7 @@ class FlairTrainer:
                 f"Kept {len(train_tagged)} train samples after removal of non-tagged samples"
             )
             train_data = InputSample.create_conll_dataset(
-                train_tagged, to_bio=to_bio, translate_tags=True)
+                train_tagged, to_bio=to_bio)
             self.to_flair(train_data, outfile="flair_train.txt")
 
         if not path.exists("flair_test.txt"):
@@ -82,7 +82,7 @@ class FlairTrainer:
             # test_samples = InputSample.read_dataset_json(test_samples_path)
             # test_samples = FakerSpansResult.load_privy_dataset(test_samples_path)
             test_data = InputSample.create_conll_dataset(
-                test_samples, to_bio=to_bio, translate_tags=True)
+                test_samples, to_bio=to_bio)
             self.to_flair(test_data, outfile="flair_test.txt")
 
         if not path.exists("flair_val.txt"):
@@ -90,7 +90,7 @@ class FlairTrainer:
             # val_samples = InputSample.read_dataset_json(val_samples_path)
             val_samples = val_samples_path
             val_data = InputSample.create_conll_dataset(
-                val_samples, to_bio=to_bio, translate_tags=True)
+                val_samples, to_bio=to_bio)
             self.to_flair(val_data, outfile="flair_val.txt")
 
     @staticmethod
