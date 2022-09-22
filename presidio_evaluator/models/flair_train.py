@@ -36,8 +36,9 @@ class FlairTrainer:
         Turn text, part of speech and label into one row.
         :return: str
         """
-        #  note: remove part of speech tag (pos) from the row because nonsensical for protocol trace data?
-        return "{} {} {}".format(text, pos, label)
+        #  note: removed part of speech tag (pos) from the row because nonsensical for protocol trace data?
+        # return "{} {} {}".format(text, pos, label)
+        return "{} {}".format(text, label)
 
     def to_flair(self, df: pd.DataFrame, outfile: str = "flair_train.txt") -> None:
         """Translate a pd.DataFrame to a flair dataset."""
@@ -100,8 +101,8 @@ class FlairTrainer:
         :param data_folder: Path with files
         :return: Corpus object
         """
-        columns = {0: "text", 1: "pos", 2: "ner"}
-        # columns = {0: "text", 1: "ner"}
+        # columns = {0: "text", 1: "pos", 2: "ner"}
+        columns = {0: "text", 1: "ner"}
         corpus = ColumnCorpus(
             data_folder,
             columns,

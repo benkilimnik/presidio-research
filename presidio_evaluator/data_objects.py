@@ -44,29 +44,9 @@ PRIVY_ENTITIES = {
     "state_abbr": "LOCATION",
     "city": "LOCATION",
 
-    # "coordinate": "LOCATION",
-    # "longitude": "LOCATION",
-    # "latitude": "LOCATION",
-
-    # "coordinate": "COORDINATE", #**
-    # "longitude": "COORDINATE", #**
-    # "latitude": "COORDINATE", #**
-
-    # "address": "STREET_ADDRESS",
-    # "street_address": "STREET_ADDRESS",
-    # "secondary_address": "STREET_ADDRESS",
-    # "zipcode": "STREET_ADDRESS",
-    # "building_number": "STREET_ADDRESS",
-    # "street_name": "STREET_ADDRESS",
-    # "airport_name": "STREET_ADDRESS",
-    # "airport_iata": "STREET_ADDRESS",  # *
-    # "airport_icao": "STREET_ADDRESS",  # *
-
-    # "country": "GPE",
-    # "country_code": "GPE",
-    # "state": "GPE",
-    # "state_abbr": "GPE",
-    # "city": "GPE",
+    "coordinate": "COORDINATE",  # **
+    "longitude": "COORDINATE",  # **
+    "latitude": "COORDINATE",  # **
 
     "nationality": "NRP",
     "nation_woman": "NRP",
@@ -124,6 +104,25 @@ PRIVY_ENTITIES = {
     "sha1": "O",
 }
 
+PRIVY_PRESIDIO_MODEL = {
+    # entities presidio performs poorly on
+    "DATE_TIME": "DATE_TIME",
+    "US_DRIVER_LICENSE": "US_DRIVER_LICENSE",
+    "PERSON": "PERSON",
+    "US_PASSPORT": "US_PASSPORT",
+    "NRP": "NRP",
+    "LOCATION": "LOCATION",
+
+    # entities not supported by presidio
+    "COORDINATE": "LOCATION",
+    "TITLE": "TITLE",
+    "IMEI": "IMEI",
+    "PASSWORD": "PASSWORD",
+    "US_LICENSE_PLATE": "US_LICENSE_PLATE",
+    "MAC_ADDRESS": "MAC_ADDRESS",
+    "AGE": "AGE",
+    "FINANCIAL": "FINANCIAL",
+}
 
 PRIVY_CONLL_TRANSLATOR = {
     "PERSON": "PERSON",
@@ -143,18 +142,18 @@ PRIVY_ONTONOTES_TRANSLATOR = {
     "ORGANIZATION": "ORG",
 }
 
-# old
 PRIVY_PRESIDIO_TRANSLATOR = {
     "PERSON": "PERSON",
     "NRP": "NRP",
     "STREET_ADDRESS": "LOCATION",
+    "LOCATION": "LOCATION",
     "GPE": "LOCATION",
     "DATE_TIME": "DATE_TIME",
     "CREDIT_CARD": "CREDIT_CARD",
     "URL": "URL",
     "DOMAIN_NAME": "URL",
     "IBAN_CODE": "IBAN_CODE",
-    "US_BANK_NUMBER": "US_BANK_NUMBER",
+    # "US_BANK_NUMBER": "US_BANK_NUMBER", # not supported somehow
     "PHONE_NUMBER": "PHONE_NUMBER",
     "US_SSN": "US_SSN",
     "US_PASSPORT": "US_PASSPORT",
@@ -163,6 +162,8 @@ PRIVY_PRESIDIO_TRANSLATOR = {
     "EMAIL_ADDRESS": "EMAIL_ADDRESS",
     "ORGANIZATION": "ORGANIZATION",
 }
+
+# old
 SPACY_PRESIDIO_ENTITIES = {
     "ORG": "ORGANIZATION",
     "NORP": "NRP",

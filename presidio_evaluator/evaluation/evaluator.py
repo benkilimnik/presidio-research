@@ -75,7 +75,7 @@ class Evaluator:
             new_annotation = self._adjust_per_entities(new_annotation)
         for i in range(0, len(new_annotation)):
             # skip punctuation labeled as entity
-            if tokens[i].text in string.punctuation or tokens[i].text in ["\\n", "\\t", " "]:
+            if tokens[i].text in string.punctuation or tokens[i].text in ["\\n", "\\t", " ", "", " \\n", "\\n "]:
                 continue
             results[(new_annotation[i], prediction[i])] += 1
 
@@ -376,8 +376,8 @@ class Evaluator:
                              for recall, precision in zip(d['recall'], d['precision'])]
             df = pd.DataFrame(d)
             df['model'] = self.model_name
-            self._plot(df, plot_type="Recall")
-            self._plot(df, plot_type="Precision")
+            # self._plot(df, plot_type="Recall")
+            # self._plot(df, plot_type="Precision")
             self._plot(df, plot_type="F2_Score")
 
             scores_output = self.output_folder / \
@@ -453,7 +453,7 @@ class Evaluator:
                     fps_df = pd.read_csv(self.output_folder /
                                          f"{self.model_name}-{entity}-fps.csv")
                     self.generate_wordcloud(
-                        fps_df, entity, error_type="fp", path_to_image=self.path_to_image)
+                        fps_df, entity, error_type="fps", path_to_image=self.path_to_image)
                 fns_df = ModelError.get_fns_dataframe(self.errors, entity=[entity])
                 if fns_df is not None:
                     fns_df.to_csv(self.output_folder /
@@ -461,7 +461,7 @@ class Evaluator:
                     fns_df = pd.read_csv(self.output_folder /
                                          f"{self.model_name}-{entity}-fns.csv")
                     self.generate_wordcloud(
-                        fns_df, entity, error_type="fn", path_to_image=self.path_to_image)
+                        fns_df, entity, error_type="fns", path_to_image=self.path_to_image)
 
         def generate_wordcloud(self, df, entity, error_type, path_to_image):
             text = ' '.join(df['token'])
@@ -474,3 +474,56 @@ class Evaluator:
             # store to file
             wc.to_file(self.output_folder /
                        f"{self.model_name}-{entity}-{error_type}-wordcloud.png")
+
+        def graph_most_common_tokens(self):
+
+            def group(df):
+                return df.groupby(['token', 'annotation']).size().to_frame(
+                ).sort_values([0], ascending=False).head(30).reset_index()
+
+            if "flair" in self.mode_name:
+                df_loc = pd.read_csv(self.output_folder /
+                                     f"{self.model_name}-LOC-fns.csv")
+                df_loc = group(df_loc)
+                df_org = pd.read_csv(self.output_folder /
+                                     f"{self.model_name}-ORG-fns.csv")
+                df_org = group(df_org)
+                df_person = pd.read_csv(self.output_folder /
+                                        f"{self.model_name}-PERSON-fns.csv")
+                df_person = group(df_person)
+                dfg = pd.concat([df_loc.head(3), df_org.head(3), df_person.head(3)])
+
+            if "presidio" in self.model_name:
+                df_loc = pd.read_csv(self.output_folder /
+                                     f"{self.model_name}-LOC-fns.csv")
+                df_loc = group(df_loc)
+                df_nrp = pd.read_csv(self.output_folder /
+                                     f"{self.model_name}-NRP-fns.csv")
+                df_nrp = group(df_nrp)
+                df_person = pd.read_csv(self.output_folder /
+                                        f"{self.model_name}-PERSON-fns.csv")
+                df_person = group(df_person)
+                dfg = pd.concat([df_loc.head(3), df_nrp.head(3), df_person.head(3)])
+
+            fig = px.histogram(dfg, x=0, y="token", orientation='h', color='annotation',
+                               title=f"Most common false negatives for {self.model_name}")
+
+            fig.update_layout(yaxis_title=f"count", xaxis_title="PII Entity")
+            fig.update_traces(textfont_size=12, textangle=0,
+                              textposition="outside", cliponaxis=False)
+            fig.update_layout(
+                plot_bgcolor="#FFF",
+                xaxis=dict(
+                    title="Count",
+                    linecolor="#BCCCDC",  # Sets color of X-axis line
+                    showgrid=False  # Removes X-axis grid lines
+                ),
+                yaxis=dict(
+                    title=f"Tokens",
+                    linecolor="#BCCCDC",  # Sets color of X-axis line
+                    showgrid=False  # Removes X-axis grid lines
+                ),
+            )
+            fig.update_layout(yaxis={'categoryorder': 'total ascending'})
+            fig.write_image(self.output_folder /
+                            f"{self.model_name}-most-common-fns.png")
