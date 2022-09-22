@@ -28,14 +28,45 @@ PRIVY_ENTITIES = {
     "last_name_male": "PERSON",
     "last_name_female": "PERSON",
 
-    "address": "STREET_ADDRESS",
-    "street_address": "STREET_ADDRESS",
-    "zipcode": "STREET_ADDRESS",
-    "building_number": "STREET_ADDRESS",
-    "street_name": "STREET_ADDRESS",
-    "airport_name": "STREET_ADDRESS",
-    "airport_iata": "STREET_ADDRESS",
-    "airport_icao": "STREET_ADDRESS",
+    "address": "LOCATION",
+    "street_address": "LOCATION",
+    "secondary_address": "LOCATION",
+    "zipcode": "LOCATION",
+    "building_number": "LOCATION",
+    "street_name": "LOCATION",
+    "airport_name": "LOCATION",
+    # "airport_iata": "LOCATION",  # *
+    # "airport_icao": "LOCATION",  # *
+
+    "country": "LOCATION",
+    "country_code": "LOCATION",
+    "state": "LOCATION",
+    "state_abbr": "LOCATION",
+    "city": "LOCATION",
+
+    # "coordinate": "LOCATION",
+    # "longitude": "LOCATION",
+    # "latitude": "LOCATION",
+
+    # "coordinate": "COORDINATE", #**
+    # "longitude": "COORDINATE", #**
+    # "latitude": "COORDINATE", #**
+
+    # "address": "STREET_ADDRESS",
+    # "street_address": "STREET_ADDRESS",
+    # "secondary_address": "STREET_ADDRESS",
+    # "zipcode": "STREET_ADDRESS",
+    # "building_number": "STREET_ADDRESS",
+    # "street_name": "STREET_ADDRESS",
+    # "airport_name": "STREET_ADDRESS",
+    # "airport_iata": "STREET_ADDRESS",  # *
+    # "airport_icao": "STREET_ADDRESS",  # *
+
+    # "country": "GPE",
+    # "country_code": "GPE",
+    # "state": "GPE",
+    # "state_abbr": "GPE",
+    # "city": "GPE",
 
     "nationality": "NRP",
     "nation_woman": "NRP",
@@ -43,12 +74,7 @@ PRIVY_ENTITIES = {
     "nation_plural": "NRP",
     "religion": "NRP",
 
-    "country": "GPE",
-    "country_code": "GPE",
-    "state": "GPE",
-    "city": "GPE",
-    "state_abbr": "GPE",
-
+    "date": "DATE_TIME",
     "date_time": "DATE_TIME",
     "date_of_birth": "DATE_TIME",
     "day_of_week": "DATE_TIME",
@@ -59,13 +85,13 @@ PRIVY_ENTITIES = {
     "domain_name": "URL",
 
     "credit_card_number": "CREDIT_CARD",
-    "credit_card_expire": "CREDIT_CARD",
+    "credit_card_expire": "DATE_TIME",
 
     "iban": "IBAN_CODE",
-    "bban": "US_BANK_NUMBER",
+    "bban": "US_BANK_NUMBER",  # *
     "phone_number": "PHONE_NUMBER",
     "ssn": "US_SSN",
-    "passport": "US_PASSPORT",
+    "passport": "US_PASSPORT",  # *
     "driver_license": "US_DRIVER_LICENSE",
     "ip_address": "IP_ADDRESS",
     "itin": "US_ITIN",
@@ -81,28 +107,52 @@ PRIVY_ENTITIES = {
     "prefix_female": "TITLE",
     "gender": "TITLE",
 
-    "coordinate": "COORDINATE",
-    "longitude": "COORDINATE",
-    "latitude": "COORDINATE",
-
     "imei": "IMEI",
     "password": "PASSWORD",
-    "license_plate": "LICENSE_PLATE",
-    "currency_code": "CURRENCY",
-    "aba": "ROUTING_NUMBER",
-    "swift": "SWIFT_CODE",
+    "license_plate": "US_LICENSE_PLATE",
     "mac_address": "MAC_ADDRESS",
     "age": "AGE",
+
+    "currency_code": "FINANCIAL",
+    "aba": "FINANCIAL",
+    "swift": "FINANCIAL",
+
+    "string": "O",
+    "boolean": "O",
+    "color": "O",
+    "random_number": "O",
+    "sha1": "O",
 }
 
+
+PRIVY_CONLL_TRANSLATOR = {
+    "PERSON": "PERSON",
+    "LOCATION": "LOC",
+    "ORGANIZATION": "ORG",
+    "NRP": "MISC",
+    # "GPE": "LOC",
+}
+
+PRIVY_ONTONOTES_TRANSLATOR = {
+    "PERSON": "PERSON",
+    "NRP": "NORP",
+    # "STREET_ADDRESS": "FAC",
+    # "LOCATION": "FAC",
+    "GPE": "GPE",
+    "DATE_TIME": "DATE",
+    "ORGANIZATION": "ORG",
+}
+
+# old
 PRIVY_PRESIDIO_TRANSLATOR = {
     "PERSON": "PERSON",
-    "STREET_ADDRESS": "LOCATION",
     "NRP": "NRP",
+    "STREET_ADDRESS": "LOCATION",
     "GPE": "LOCATION",
     "DATE_TIME": "DATE_TIME",
     "CREDIT_CARD": "CREDIT_CARD",
     "URL": "URL",
+    "DOMAIN_NAME": "URL",
     "IBAN_CODE": "IBAN_CODE",
     "US_BANK_NUMBER": "US_BANK_NUMBER",
     "PHONE_NUMBER": "PHONE_NUMBER",
@@ -110,28 +160,9 @@ PRIVY_PRESIDIO_TRANSLATOR = {
     "US_PASSPORT": "US_PASSPORT",
     "US_DRIVER_LICENSE": "US_DRIVER_LICENSE",
     "IP_ADDRESS": "IP_ADDRESS",
-    "US_ITIN": "US_ITIN",
     "EMAIL_ADDRESS": "EMAIL_ADDRESS",
+    "ORGANIZATION": "ORGANIZATION",
 }
-
-PRIVY_ONTONOTES_TRANSLATOR = {
-    "PERSON": "PERSON",
-    "NRP": "NORP",
-    "STREET_ADDRESS": "FAC",
-    "GPE": "GPE",
-    "DATE_TIME": "DATE",
-    "ORGANIZATION": "ORG",
-}
-
-PRIVY_CONLL_TRANSLATOR = {
-    "PERSON": "PERSON",
-    "NRP": "MISC",
-    "STREET_ADDRESS": "LOC",
-    "GPE": "LOC",
-    "ORGANIZATION": "ORG",
-}
-
-# old
 SPACY_PRESIDIO_ENTITIES = {
     "ORG": "ORGANIZATION",
     "NORP": "NRP",
