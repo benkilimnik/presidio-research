@@ -74,6 +74,9 @@ class Evaluator:
             prediction = self._adjust_per_entities(prediction)
             new_annotation = self._adjust_per_entities(new_annotation)
         for i in range(0, len(new_annotation)):
+            # skip punctuation labeled as entity
+            if tokens[i].text in string.punctuation or tokens[i].text in ["\\n", "\\t", " "]:
+                continue
             results[(new_annotation[i], prediction[i])] += 1
 
             if self.verbose:
@@ -84,9 +87,6 @@ class Evaluator:
             # check if there was an error
             is_error = new_annotation[i] != prediction[i]
             if is_error:
-                # skip punctuation labeled as entity
-                if tokens[i].text in string.punctuation or tokens[i].text in ["\\n", "\\t"]:
-                    continue
                 if prediction[i] == "O":
                     mistakes.append(
                         ModelError(
@@ -356,12 +356,13 @@ class Evaluator:
         )
 
     class ErrorAnalyzer:
-        def __init__(self, model, results, errors, output_folder, model_name):
+        def __init__(self, model, results, errors, output_folder, model_name, path_to_wordcloud_image):
             self.model = model
             self.results = results
             self.errors = errors
             self.output_folder = output_folder
             self.model_name = model_name.replace("/", "-")
+            self.path_to_image = path_to_wordcloud_image
 
         def plot_recall_precision_f2(self) -> None:
             """Plot per-entity recall and precision"""
@@ -451,18 +452,21 @@ class Evaluator:
                                   f"{self.model_name}-{entity}-fps.csv")
                     fps_df = pd.read_csv(self.output_folder /
                                          f"{self.model_name}-{entity}-fps.csv")
-                    self.generate_wordcloud(fps_df, entity, error_type="fp")
+                    self.generate_wordcloud(
+                        fps_df, entity, error_type="fp", path_to_image=self.path_to_image)
                 fns_df = ModelError.get_fns_dataframe(self.errors, entity=[entity])
                 if fns_df is not None:
                     fns_df.to_csv(self.output_folder /
                                   f"{self.model_name}-{entity}-fns.csv")
                     fns_df = pd.read_csv(self.output_folder /
                                          f"{self.model_name}-{entity}-fns.csv")
-                    self.generate_wordcloud(fns_df, entity, error_type="fn")
+                    self.generate_wordcloud(
+                        fns_df, entity, error_type="fn", path_to_image=self.path_to_image)
 
-        def generate_wordcloud(self, df, entity, error_type):
+        def generate_wordcloud(self, df, entity, error_type, path_to_image):
             text = ' '.join(df['token'])
-            alice_mask = np.array(Image.open("padlock.jpg"))
+            alice_mask = np.array(Image.open(path_to_image))
+            # alice_mask = np.array(Image.open(Path(__file__).with_name(path_to_image)))
             wc = WordCloud(stopwords=["testing"], background_color="black", max_font_size=100, max_words=1000, mask=alice_mask,
                            contour_width=0)
             # generate word cloud
