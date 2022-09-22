@@ -222,7 +222,7 @@ class FlairTrainer:
         # 7. run fine-tuning
         trainer.fine_tune('resources/taggers/privy-flair-transformers',
                           learning_rate=5.0e-6,
-                          mini_batch_size=4,
+                          mini_batch_size=1,
                           max_epochs=20,
                           #   scheduler=OneCycleLR,
                           mini_batch_chunk_size=1,  # remove this parameter to speed up computation if you have a big GPU
