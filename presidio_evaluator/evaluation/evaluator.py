@@ -447,14 +447,18 @@ class Evaluator:
             for entity in self.model.entity_mapping.values():
                 fps_df = ModelError.get_fps_dataframe(self.errors, entity=[entity])
                 if fps_df is not None:
-                    self.generate_wordcloud(fps_df, entity, error_type="fp")
                     fps_df.to_csv(self.output_folder /
                                   f"{self.model_name}-{entity}-fps.csv")
+                    fps_df = pd.read_csv(self.output_folder /
+                                         f"{self.model_name}-{entity}-fps.csv")
+                    self.generate_wordcloud(fps_df, entity, error_type="fp")
                 fns_df = ModelError.get_fns_dataframe(self.errors, entity=[entity])
                 if fns_df is not None:
-                    self.generate_wordcloud(fns_df, entity, error_type="fn")
                     fns_df.to_csv(self.output_folder /
                                   f"{self.model_name}-{entity}-fns.csv")
+                    fns_df = pd.read_csv(self.output_folder /
+                                         f"{self.model_name}-{entity}-fns.csv")
+                    self.generate_wordcloud(fns_df, entity, error_type="fn")
 
         def generate_wordcloud(self, df, entity, error_type):
             text = ' '.join(df['token'])
