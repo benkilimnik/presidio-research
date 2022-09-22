@@ -1,6 +1,7 @@
 from collections import Counter
 from typing import List, Optional, Dict
 
+import string
 import numpy as np
 from tqdm import tqdm
 
@@ -77,6 +78,9 @@ class Evaluator:
             # check if there was an error
             is_error = new_annotation[i] != prediction[i]
             if is_error:
+                # skip punctuation labeled as entity
+                if tokens[i] in string.punctuation or tokens[i] in ["\\n", "\\t"]:
+                    continue
                 if prediction[i] == "O":
                     mistakes.append(
                         ModelError(

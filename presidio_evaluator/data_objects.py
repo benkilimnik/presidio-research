@@ -129,7 +129,7 @@ PRIVY_CONLL_TRANSLATOR = {
     "PERSON": "PERSON",
     "LOCATION": "LOC",
     "ORGANIZATION": "ORG",
-    "NRP": "MISC",
+    # "NRP": "MISC",
     # "GPE": "LOC",
 }
 

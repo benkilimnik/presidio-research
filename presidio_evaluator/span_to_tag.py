@@ -13,7 +13,7 @@ def get_spacy(loaded_spacy=loaded_spacy, model_version="en_core_web_sm"):
         print("loading model {}".format(model_version))
         nlp = spacy.load(model_version)
         # split on these additional characters =' is for sql queries, < and > for html, xml)
-        infixes = nlp.Defaults.infixes + [r'([><(=\')])']
+        infixes = nlp.Defaults.infixes + [r'([><(=\'),"])']
         nlp.tokenizer.infix_finditer = spacy.util.compile_infix_regex(infixes).finditer
 
         for tagName in "html body i br p".split():
