@@ -85,7 +85,7 @@ class Evaluator:
             is_error = new_annotation[i] != prediction[i]
             if is_error:
                 # skip punctuation labeled as entity
-                if tokens[i] in string.punctuation or tokens[i] in ["\\n", "\\t"]:
+                if tokens[i].text in string.punctuation or tokens[i].text in ["\\n", "\\t"]:
                     continue
                 if prediction[i] == "O":
                     mistakes.append(
@@ -355,115 +355,114 @@ class Evaluator:
             ((beta ** 2) * precision) + recall
         )
 
+    class ErrorAnalyzer:
+        def __init__(self, model, results, errors, output_folder, model_name):
+            self.model = model
+            self.results = results
+            self.errors = errors
+            self.output_folder = output_folder
+            self.model_name = model_name.replace("/", "-")
 
-class ErrorAnalyzer:
-    def __init__(self, model, results, errors, output_folder, model_name):
-        self.model = model
-        self.results = results
-        self.errors = errors
-        self.output_folder = output_folder
-        self.model_name = model_name.replace("/", "-")
+        def plot_recall_precision_f2(self) -> None:
+            """Plot per-entity recall and precision"""
+            d = {}
+            d['entity'] = deepcopy(list(self.results.entity_recall_dict.keys()))
+            d['recall'] = deepcopy(list(self.results.entity_recall_dict.values()))
+            d['precision'] = deepcopy(
+                list(self.results.entity_precision_dict.values()))
+            d['count'] = deepcopy(list(self.results.n_dict.values()))
+            d['f2_score'] = [Evaluator.f_beta(precision=precision, recall=recall, beta=2.5)
+                             for recall, precision in zip(d['recall'], d['precision'])]
+            df = pd.DataFrame(d)
+            df['model'] = self.model_name
+            self._plot(df, plot_type="Recall")
+            self._plot(df, plot_type="Precision")
+            self._plot(df, plot_type="F2_Score")
 
-    def plot_recall_precision_f2(self) -> None:
-        """Plot per-entity recall and precision"""
-        d = {}
-        d['entity'] = deepcopy(list(self.results.entity_recall_dict.keys()))
-        d['recall'] = deepcopy(list(self.results.entity_recall_dict.values()))
-        d['precision'] = deepcopy(
-            list(self.results.entity_precision_dict.values()))
-        d['count'] = deepcopy(list(self.results.n_dict.values()))
-        d['f2_score'] = [Evaluator.f_beta(precision=precision, recall=recall, beta=2.5)
-                         for recall, precision in zip(d['recall'], d['precision'])]
-        df = pd.DataFrame(d)
-        df['model'] = self.model_name
-        self._plot(df, plot_type="Recall")
-        self._plot(df, plot_type="Precision")
-        self._plot(df, plot_type="F2_Score")
+            scores_output = self.output_folder / \
+                f"scores-dict-{self.model_name}.json"
+            df.to_csv(scores_output, index=False)
 
-        scores_output = self.output_folder / \
-            f"scores-dict-{self.model_name}.json"
-        df.to_csv(scores_output, index=False)
+        def _plot(self, df, plot_type: str) -> None:
+            fig = px.bar(df, text_auto=".2", y='entity', orientation="h",
+                         x=f'{plot_type.lower()}', color='count', barmode='group', title=f"Per-entity {plot_type} for {self.model_name}")
+            fig.update_layout(barmode='group', yaxis={
+                'categoryorder': 'total ascending'})
+            fig.update_layout(yaxis_title=f"{plot_type}", xaxis_title="PII Entity")
+            fig.update_traces(textfont_size=12, textangle=0,
+                              textposition="outside", cliponaxis=False)
+            fig.update_layout(
+                plot_bgcolor="#FFF",
+                xaxis=dict(
+                    title="PII entity",
+                    linecolor="#BCCCDC",  # Sets color of X-axis line
+                    showgrid=False  # Removes X-axis grid lines
+                ),
+                yaxis=dict(
+                    title=f"{plot_type}",
+                    linecolor="#BCCCDC",  # Sets color of X-axis line
+                    showgrid=False  # Removes X-axis grid lines
+                ),
+            )
+            filename = self.output_folder / \
+                f"{plot_type.lower()}_{self.model_name}.html"
+            plotly.offline.plot(
+                fig, filename=str(filename))
+            filename = self.output_folder / \
+                f"{plot_type.lower()}_{self.model_name}.png"
+            fig.write_image(filename)
 
-    def _plot(self, df, plot_type: str) -> None:
-        fig = px.bar(df, text_auto=".2", y='entity', orientation="h",
-                     x=f'{plot_type.lower()}', color='count', barmode='group', title=f"Per-entity {plot_type} for {self.model_name}")
-        fig.update_layout(barmode='group', yaxis={
-                          'categoryorder': 'total ascending'})
-        fig.update_layout(yaxis_title=f"{plot_type}", xaxis_title="PII Entity")
-        fig.update_traces(textfont_size=12, textangle=0,
-                          textposition="outside", cliponaxis=False)
-        fig.update_layout(
-            plot_bgcolor="#FFF",
-            xaxis=dict(
-                title="PII entity",
-                linecolor="#BCCCDC",  # Sets color of X-axis line
-                showgrid=False  # Removes X-axis grid lines
-            ),
-            yaxis=dict(
-                title=f"{plot_type}",
-                linecolor="#BCCCDC",  # Sets color of X-axis line
-                showgrid=False  # Removes X-axis grid lines
-            ),
-        )
-        filename = self.output_folder / \
-            f"{plot_type.lower()}_{self.model_name}.html"
-        plotly.offline.plot(
-            fig, filename=str(filename))
-        filename = self.output_folder / \
-            f"{plot_type.lower()}_{self.model_name}.png"
-        fig.write_image(filename)
+        def _plot_multiple_models(score_files: List[Path], model_name: str, plot_type: str) -> None:
+            """Plot per-entity Recall, Precision or F2 Score for multiple models given dataframes saved to csv during evaluation"""
+            df = pd.read_csv(score_files[0])
+            # combine score dataframes
+            for file in score_files[1:]:
+                df = pd.concat([df, pd.read_csv(file)])
 
-    def _plot_multiple_models(score_files: List[Path], model_name: str, plot_type: str) -> None:
-        """Plot per-entity Recall, Precision or F2 Score for multiple models given dataframes saved to csv during evaluation"""
-        df = pd.read_csv(score_files[0])
-        # combine score dataframes
-        for file in score_files[1:]:
-            df = pd.concat([df, pd.read_csv(file)])
+            fig = px.bar(df, text_auto=".2", x='entity',
+                         y=f'{plot_type.lower()}', color='model', barmode='group', title=f"Per-entity {plot_type} for {model_name}")
+            fig.update_layout(barmode='group', xaxis={
+                'categoryorder': 'total ascending'})
+            fig.update_layout(yaxis_title=f"{plot_type}", xaxis_title="PII Entity")
+            fig.update_traces(textfont_size=12, textangle=0,
+                              textposition="outside", cliponaxis=False)
+            fig.update_layout(
+                plot_bgcolor="#FFF",
+                xaxis=dict(
+                    title="PII entity",
+                    linecolor="#BCCCDC",  # Sets color of X-axis line
+                    showgrid=False  # Removes X-axis grid lines
+                ),
+                yaxis=dict(
+                    title="Recall",
+                    linecolor="#BCCCDC",  # Sets color of X-axis line
+                    showgrid=False  # Removes X-axis grid lines
+                ),
+            )
+            fig.show()
 
-        fig = px.bar(df, text_auto=".2", x='entity',
-                     y=f'{plot_type.lower()}', color='model', barmode='group', title=f"Per-entity {plot_type} for {model_name}")
-        fig.update_layout(barmode='group', xaxis={
-            'categoryorder': 'total ascending'})
-        fig.update_layout(yaxis_title=f"{plot_type}", xaxis_title="PII Entity")
-        fig.update_traces(textfont_size=12, textangle=0,
-                          textposition="outside", cliponaxis=False)
-        fig.update_layout(
-            plot_bgcolor="#FFF",
-            xaxis=dict(
-                title="PII entity",
-                linecolor="#BCCCDC",  # Sets color of X-axis line
-                showgrid=False  # Removes X-axis grid lines
-            ),
-            yaxis=dict(
-                title="Recall",
-                linecolor="#BCCCDC",  # Sets color of X-axis line
-                showgrid=False  # Removes X-axis grid lines
-            ),
-        )
-        fig.show()
+        def save_errors(self):
+            ModelError.most_common_fp_tokens(self.errors)
 
-    def save_errors(self):
-        ModelError.most_common_fp_tokens(self.errors)
+            for entity in self.model.entity_mapping.values():
+                fps_df = ModelError.get_fps_dataframe(self.errors, entity=[entity])
+                if fps_df is not None:
+                    self.generate_wordcloud(fps_df, entity, error_type="fp")
+                    fps_df.to_csv(self.output_folder /
+                                  f"{self.model_name}-{entity}-fps.csv")
+                fns_df = ModelError.get_fns_dataframe(self.errors, entity=[entity])
+                if fns_df is not None:
+                    self.generate_wordcloud(fns_df, entity, error_type="fn")
+                    fns_df.to_csv(self.output_folder /
+                                  f"{self.model_name}-{entity}-fns.csv")
 
-        for entity in self.model.entity_mapping.values():
-            fps_df = ModelError.get_fps_dataframe(self.errors, entity=[entity])
-            if fps_df is not None:
-                self.generate_wordcloud(fps_df, entity, error_type="fp")
-                fps_df.to_csv(self.output_folder /
-                              f"{self.model_name}-{entity}-fps.csv")
-            fns_df = ModelError.get_fns_dataframe(self.errors, entity=[entity])
-            if fns_df is not None:
-                self.generate_wordcloud(fns_df, entity, error_type="fn")
-                fns_df.to_csv(self.output_folder /
-                              f"{self.model_name}-{entity}-fns.csv")
-
-    def generate_wordcloud(self, df, entity, error_type):
-        text = ' '.join(df['token'])
-        alice_mask = np.array(Image.open("padlock.jpg"))
-        wc = WordCloud(stopwords=["testing"], background_color="black", max_font_size=100, max_words=1000, mask=alice_mask,
-                       contour_width=0)
-        # generate word cloud
-        wc.generate(text)
-        # store to file
-        wc.to_file(self.output_folder /
-                   f"{self.model_name}-{entity}-{error_type}-wordcloud.png")
+        def generate_wordcloud(self, df, entity, error_type):
+            text = ' '.join(df['token'])
+            alice_mask = np.array(Image.open("padlock.jpg"))
+            wc = WordCloud(stopwords=["testing"], background_color="black", max_font_size=100, max_words=1000, mask=alice_mask,
+                           contour_width=0)
+            # generate word cloud
+            wc.generate(text)
+            # store to file
+            wc.to_file(self.output_folder /
+                       f"{self.model_name}-{entity}-{error_type}-wordcloud.png")

@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "privy-presidio-utils"
-version = "0.0.31"
+version = "0.0.32"
 description = "Read the latest Real Python tutorials"
 readme = "README.md"
 license = { file = "LICENSE" }
