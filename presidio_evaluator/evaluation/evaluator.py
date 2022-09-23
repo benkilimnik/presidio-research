@@ -464,7 +464,7 @@ class Evaluator:
                         fns_df, entity, error_type="fns", path_to_image=self.path_to_image)
 
         def generate_wordcloud(self, df, entity, error_type, path_to_image):
-            text = ' '.join(df['token'])
+            text = ' '.join(str(v) for v in df['token'])
             alice_mask = np.array(Image.open(path_to_image))
             # alice_mask = np.array(Image.open(Path(__file__).with_name(path_to_image)))
             wc = WordCloud(stopwords=["testing"], background_color="black", max_font_size=100, max_words=1000, mask=alice_mask,
@@ -481,7 +481,7 @@ class Evaluator:
                 return df.groupby(['token', 'annotation']).size().to_frame(
                 ).sort_values([0], ascending=False).head(30).reset_index()
 
-            if "flair" in self.mode_name:
+            if "flair" in self.model_name:
                 df_loc = pd.read_csv(self.output_folder /
                                      f"{self.model_name}-LOC-fns.csv")
                 df_loc = group(df_loc)
