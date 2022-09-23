@@ -104,17 +104,18 @@ PRIVY_ENTITIES = {
     "sha1": "O",
 }
 
+# mapping to match CONLL and custom entities
 PRIVY_PRESIDIO_MODEL = {
     # entities presidio performs poorly on
     "DATE_TIME": "DATE_TIME",
     "US_DRIVER_LICENSE": "US_DRIVER_LICENSE",
-    "PERSON": "PERSON",
+    "PERSON": "PER",
     "US_PASSPORT": "US_PASSPORT",
     "NRP": "NRP",
-    "LOCATION": "LOCATION",
+    "LOCATION": "LOC",
 
     # entities not supported by presidio
-    "COORDINATE": "LOCATION",
+    "COORDINATE": "LOC",
     "TITLE": "TITLE",
     "IMEI": "IMEI",
     "PASSWORD": "PASSWORD",
