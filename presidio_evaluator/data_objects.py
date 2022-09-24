@@ -142,40 +142,38 @@ PRIVY_PRESIDIO_MODEL = {
     "nation_plural": "NRP",
     "religion": "NRP",
 
-    # ! add back
-    # "date": "DATE_TIME",
-    # "date_time": "DATE_TIME",
-    # "date_of_birth": "DATE_TIME",
-    # "day_of_week": "DATE_TIME",
-    # "year": "DATE_TIME",
-    # "month": "DATE_TIME",
+    "date": "DATE_TIME",
+    "date_time": "DATE_TIME",
+    "date_of_birth": "DATE_TIME",
+    "day_of_week": "DATE_TIME",
+    "year": "DATE_TIME",
+    "month": "DATE_TIME",
 
-    # "url": "URL",
-    # "domain_name": "URL",
+    "url": "O",
+    "domain_name": "O",
 
-    # "credit_card_number": "CREDIT_CARD",
-    # "credit_card_expire": "DATE_TIME", # ! add back
+    "credit_card_number": "CREDIT_CARD",
+    "credit_card_expire": "DATE_TIME",
 
-    # "iban": "IBAN_CODE",
-    # "bban": "US_BANK_NUMBER",  # *
-    # "phone_number": "PHONE_NUMBER",
-    # "ssn": "US_SSN",
+    "iban": "O",
+    "bban": "US_BANK_NUMBER",  # *
+    "phone_number": "O",
+    "ssn": "O",
     "passport": "US_PASSPORT",  # *
     "driver_license": "US_DRIVER_LICENSE",
-    # "ip_address": "IP_ADDRESS",
-    # "itin": "US_ITIN",
-    # "email": "EMAIL_ADDRESS",
+    "ip_address": "O",
+    "itin": "US_ITIN",
+    "email": "O",
 
     "organization": "ORG",
     "company": "ORG",
     "airline": "ORG",
 
-    # ! todo add back in
-    # "job": "TITLE",
-    # "prefix": "TITLE",
-    # "prefix_male": "TITLE",
-    # "prefix_female": "TITLE",
-    # "gender": "TITLE",
+    "job": "TITLE",
+    "prefix": "TITLE",
+    "prefix_male": "TITLE",
+    "prefix_female": "TITLE",
+    "gender": "TITLE",
 
     "imei": "IMEI",
     "password": "PASSWORD",
@@ -183,10 +181,9 @@ PRIVY_PRESIDIO_MODEL = {
     "mac_address": "MAC_ADDRESS",
     "age": "AGE",
 
-    # ! add back in
-    # "currency_code": "FINANCIAL",
-    # "aba": "FINANCIAL",
-    # "swift": "FINANCIAL",
+    "currency_code": "FINANCIAL",
+    "aba": "FINANCIAL",
+    "swift": "FINANCIAL",
 
     "string": "O",
     "boolean": "O",
