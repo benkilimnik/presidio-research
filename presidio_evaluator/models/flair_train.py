@@ -66,33 +66,30 @@ class FlairTrainer:
         :param val_samples_path: Path to validation samples
         :return:
         """
-        if not path.exists("flair_train.txt"):
-            train_samples = train_samples_path
-            # train_samples = InputSample.read_dataset_json(train_samples_path)
-            # train_samples = FakerSpansResult.load_privy_dataset(train_samples_path)
-            train_tagged = [sample for sample in train_samples if len(sample.spans) > 0]
-            print(
-                f"Kept {len(train_tagged)} train samples after removal of non-tagged samples"
-            )
-            train_data = InputSample.create_conll_dataset(
-                train_tagged, to_bio=to_bio)
-            self.to_flair(train_data, outfile="flair_train.txt")
+        train_samples = train_samples_path
+        # train_samples = InputSample.read_dataset_json(train_samples_path)
+        # train_samples = FakerSpansResult.load_privy_dataset(train_samples_path)
+        train_tagged = [sample for sample in train_samples if len(sample.spans) > 0]
+        print(
+            f"Kept {len(train_tagged)} train samples after removal of non-tagged samples"
+        )
+        train_data = InputSample.create_conll_dataset(
+            train_tagged, to_bio=to_bio)
+        self.to_flair(train_data, outfile="flair_train.txt")
 
-        if not path.exists("flair_test.txt"):
-            test_samples = test_samples_path
-            # test_samples = InputSample.read_dataset_json(test_samples_path)
-            # test_samples = FakerSpansResult.load_privy_dataset(test_samples_path)
-            test_data = InputSample.create_conll_dataset(
-                test_samples, to_bio=to_bio)
-            self.to_flair(test_data, outfile="flair_test.txt")
+        test_samples = test_samples_path
+        # test_samples = InputSample.read_dataset_json(test_samples_path)
+        # test_samples = FakerSpansResult.load_privy_dataset(test_samples_path)
+        test_data = InputSample.create_conll_dataset(
+            test_samples, to_bio=to_bio)
+        self.to_flair(test_data, outfile="flair_test.txt")
 
-        if not path.exists("flair_val.txt"):
-            # val_samples = FakerSpansResult.load_privy_dataset(val_samples_path)
-            # val_samples = InputSample.read_dataset_json(val_samples_path)
-            val_samples = val_samples_path
-            val_data = InputSample.create_conll_dataset(
-                val_samples, to_bio=to_bio)
-            self.to_flair(val_data, outfile="flair_val.txt")
+        # val_samples = FakerSpansResult.load_privy_dataset(val_samples_path)
+        # val_samples = InputSample.read_dataset_json(val_samples_path)
+        val_samples = val_samples_path
+        val_data = InputSample.create_conll_dataset(
+            val_samples, to_bio=to_bio)
+        self.to_flair(val_data, outfile="flair_val.txt")
 
     @staticmethod
     def read_corpus(data_folder: str):
@@ -231,6 +228,7 @@ class FlairTrainer:
                           #   scheduler=OneCycleLR,
                           mini_batch_chunk_size=1,  # remove this parameter to speed up computation if you have a big GPU
                           #   weight_decay=0.,
+                          checkpoint=True,
                           )
 
         sentence = Sentence("I am from Jerusalem")
