@@ -7,6 +7,7 @@ import spacy
 from spacy import Language
 from spacy.tokens import Doc, DocBin
 from spacy.training import iob_to_biluo
+from spacy.symbols import ORTH
 from tqdm import tqdm
 from collections import Counter
 
@@ -611,6 +612,27 @@ class InputSample(object):
         )
 
     @staticmethod
+    def get_spacy(model_version="en_core_web_sm"):
+        # add custom rules to spacy tokenizer to break down html, xml, sql into single tokens
+        print("loading model {}".format(model_version))
+        nlp = spacy.load(model_version)
+        # split on these additional characters =' is for sql queries, < and > for html, xml)
+        infixes = nlp.Defaults.infixes + [r'([><(=\'),"])']
+        nlp.tokenizer.infix_finditer = spacy.util.compile_infix_regex(infixes).finditer
+
+        for tagName in "html body i br p".split():
+            nlp.tokenizer.add_special_case(f"<{tagName}>", [{ORTH: f"<{tagName}>"}])
+            nlp.tokenizer.add_special_case(f"</{tagName}>", [{ORTH: f"</{tagName}>"}])
+
+        for tagName in "br p".split():
+            nlp.tokenizer.add_special_case(f"<{tagName}/>", [{ORTH: f"<{tagName}/>"}])
+
+        for tagName in "html body i br p".split():
+            nlp.tokenizer.add_special_case(f"<{tagName}>", [{ORTH: f"<{tagName}>"}])
+            nlp.tokenizer.add_special_case(f"</{tagName}>", [{ORTH: f"</{tagName}>"}])
+        return nlp
+
+    @staticmethod
     def create_spacy_dataset(
         dataset: List["InputSample"],
         output_path: Optional[str] = None,
@@ -643,7 +665,7 @@ class InputSample(object):
             dataset.sort(key=template_sort)
 
         if not spacy_pipeline:
-            spacy_pipeline = spacy.load("en_core_web_sm")
+            spacy_pipeline = InputSample.get_spacy()
 
         spacy_dataset = [
             sample.to_spacy(entities=entities, translate_tags=translate_tags)
