@@ -176,7 +176,7 @@ class FlairTrainer:
             print(entity)
 
     @staticmethod
-    def train_with_transformers(corpus, add_unk=False):
+    def train_with_transformers(corpus, add_unk=False, mini_batch_size=1, embeddings="xlm-roberta-base"):
         """
         Train a Flair model
         :param corpus: Corpus object
@@ -196,7 +196,8 @@ class FlairTrainer:
         print(tag_dictionary)
 
         # 4. initialize fine-tuneable transformer embeddings WITH document context
-        embedding_types: List[TokenEmbeddings] = [TransformerWordEmbeddings(model='xlm-roberta-large',
+        # previously xlm-roberta-large
+        embedding_types: List[TokenEmbeddings] = [TransformerWordEmbeddings(model=embeddings,
                                                                             layers="-1",
                                                                             subtoken_pooling="first",
                                                                             fine_tune=True,
@@ -223,7 +224,7 @@ class FlairTrainer:
         # 7. run fine-tuning
         trainer.fine_tune('resources/taggers/privy-flair-transformers',
                           learning_rate=5.0e-6,
-                          mini_batch_size=1,
+                          mini_batch_size=mini_batch_size,
                           max_epochs=20,
                           #   scheduler=OneCycleLR,
                           mini_batch_chunk_size=1,  # remove this parameter to speed up computation if you have a big GPU

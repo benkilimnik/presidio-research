@@ -465,6 +465,8 @@ class Evaluator:
 
         def generate_wordcloud(self, df, entity, error_type, path_to_image):
             text = ' '.join(str(v) for v in df['token'])
+            if not text:
+                return
             alice_mask = np.array(Image.open(path_to_image))
             # alice_mask = np.array(Image.open(Path(__file__).with_name(path_to_image)))
             wc = WordCloud(stopwords=["testing"], background_color="black", max_font_size=100, max_words=1000, mask=alice_mask,
@@ -481,49 +483,46 @@ class Evaluator:
                 return df.groupby(['token', 'annotation']).size().to_frame(
                 ).sort_values([0], ascending=False).head(30).reset_index()
 
-            if "flair" in self.model_name:
+            def generate_graph(type, type_title):
                 df_loc = pd.read_csv(self.output_folder /
-                                     f"{self.model_name}-LOC-fns.csv")
+                                     f"{self.model_name}-LOC-{type}.csv")
                 df_loc = group(df_loc)
-                df_org = pd.read_csv(self.output_folder /
-                                     f"{self.model_name}-ORG-fns.csv")
-                df_org = group(df_org)
+
+                if "presidio" in self.model_name:
+                    df_org = pd.read_csv(self.output_folder /
+                                         f"{self.model_name}-NRP-{type}.csv")
+                    df_org = group(df_org)
+                else:
+                    df_org = pd.read_csv(self.output_folder /
+                                         f"{self.model_name}-ORG-{type}.csv")
+                    df_org = group(df_org)
                 df_person = pd.read_csv(self.output_folder /
-                                        f"{self.model_name}-PERSON-fns.csv")
+                                        f"{self.model_name}-PERSON-{type}.csv")
                 df_person = group(df_person)
                 dfg = pd.concat([df_loc.head(3), df_org.head(3), df_person.head(3)])
 
-            if "presidio" in self.model_name:
-                df_loc = pd.read_csv(self.output_folder /
-                                     f"{self.model_name}-LOC-fns.csv")
-                df_loc = group(df_loc)
-                df_nrp = pd.read_csv(self.output_folder /
-                                     f"{self.model_name}-NRP-fns.csv")
-                df_nrp = group(df_nrp)
-                df_person = pd.read_csv(self.output_folder /
-                                        f"{self.model_name}-PERSON-fns.csv")
-                df_person = group(df_person)
-                dfg = pd.concat([df_loc.head(3), df_nrp.head(3), df_person.head(3)])
+                fig = px.histogram(dfg, x=0, y="token", orientation='h', color='annotation',
+                                   title=f"Most common {type_title} for {self.model_name}")
 
-            fig = px.histogram(dfg, x=0, y="token", orientation='h', color='annotation',
-                               title=f"Most common false negatives for {self.model_name}")
+                fig.update_layout(yaxis_title=f"count", xaxis_title="PII Entity")
+                fig.update_traces(textfont_size=12, textangle=0,
+                                  textposition="outside", cliponaxis=False)
+                fig.update_layout(
+                    plot_bgcolor="#FFF",
+                    xaxis=dict(
+                        title="Count",
+                        linecolor="#BCCCDC",  # Sets color of X-axis line
+                        showgrid=False  # Removes X-axis grid lines
+                    ),
+                    yaxis=dict(
+                        title=f"Tokens",
+                        linecolor="#BCCCDC",  # Sets color of X-axis line
+                        showgrid=False  # Removes X-axis grid lines
+                    ),
+                )
+                fig.update_layout(yaxis={'categoryorder': 'total ascending'})
+                fig.write_image(self.output_folder /
+                                f"{self.model_name}-most-common-{type}.png")
 
-            fig.update_layout(yaxis_title=f"count", xaxis_title="PII Entity")
-            fig.update_traces(textfont_size=12, textangle=0,
-                              textposition="outside", cliponaxis=False)
-            fig.update_layout(
-                plot_bgcolor="#FFF",
-                xaxis=dict(
-                    title="Count",
-                    linecolor="#BCCCDC",  # Sets color of X-axis line
-                    showgrid=False  # Removes X-axis grid lines
-                ),
-                yaxis=dict(
-                    title=f"Tokens",
-                    linecolor="#BCCCDC",  # Sets color of X-axis line
-                    showgrid=False  # Removes X-axis grid lines
-                ),
-            )
-            fig.update_layout(yaxis={'categoryorder': 'total ascending'})
-            fig.write_image(self.output_folder /
-                            f"{self.model_name}-most-common-fns.png")
+            generate_graph(type="fns", type_title="false negatives")
+            generate_graph(type="fps", type_title="false positives")

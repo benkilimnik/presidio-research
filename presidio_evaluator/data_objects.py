@@ -35,8 +35,8 @@ PRIVY_ENTITIES = {
     "building_number": "LOCATION",
     "street_name": "LOCATION",
     "airport_name": "LOCATION",
-    # "airport_iata": "LOCATION",  # *
-    # "airport_icao": "LOCATION",  # *
+    "airport_iata": "LOCATION",  # *
+    "airport_icao": "LOCATION",  # *
 
     "country": "LOCATION",
     "country_code": "LOCATION",
@@ -104,26 +104,117 @@ PRIVY_ENTITIES = {
     "sha1": "O",
 }
 
-# mapping to match CONLL and custom entities
 PRIVY_PRESIDIO_MODEL = {
-    # entities presidio performs poorly on
-    "DATE_TIME": "DATE_TIME",
-    "US_DRIVER_LICENSE": "US_DRIVER_LICENSE",
-    "PERSON": "PER",
-    "US_PASSPORT": "US_PASSPORT",
-    "NRP": "NRP",
-    "LOCATION": "LOC",
+    "person": "PER",
+    "name_male": "PER",
+    "name_female": "PER",
+    "first_name": "PER",
+    "first_name_male": "PER",
+    "first_name_female": "PER",
+    "first_name_nonbinary": "PER",
+    "last_name": "PER",
+    "last_name_male": "PER",
+    "last_name_female": "PER",
 
-    # entities not supported by presidio
-    "COORDINATE": "LOC",
-    "TITLE": "TITLE",
-    "IMEI": "IMEI",
-    "PASSWORD": "PASSWORD",
-    "US_LICENSE_PLATE": "US_LICENSE_PLATE",
-    "MAC_ADDRESS": "MAC_ADDRESS",
-    "AGE": "AGE",
-    "FINANCIAL": "FINANCIAL",
+    "address": "LOC",
+    "street_address": "LOC",
+    "secondary_address": "LOC",
+    "zipcode": "LOC",
+    "building_number": "LOC",
+    "street_name": "LOC",
+    "airport_name": "LOC",
+    "airport_iata": "LOC",  # *
+    "airport_icao": "LOC",  # *
+
+    "country": "LOC",
+    "country_code": "LOC",
+    "state": "LOC",
+    "state_abbr": "LOC",
+    "city": "LOC",
+
+    "coordinate": "LOC",  # **
+    "longitude": "LOC",  # **
+    "latitude": "LOC",  # **
+
+    "nationality": "NRP",
+    "nation_woman": "NRP",
+    "nation_man": "NRP",
+    "nation_plural": "NRP",
+    "religion": "NRP",
+
+    # ! add back
+    # "date": "DATE_TIME",
+    # "date_time": "DATE_TIME",
+    # "date_of_birth": "DATE_TIME",
+    # "day_of_week": "DATE_TIME",
+    # "year": "DATE_TIME",
+    # "month": "DATE_TIME",
+
+    # "url": "URL",
+    # "domain_name": "URL",
+
+    # "credit_card_number": "CREDIT_CARD",
+    # "credit_card_expire": "DATE_TIME", # ! add back
+
+    # "iban": "IBAN_CODE",
+    # "bban": "US_BANK_NUMBER",  # *
+    # "phone_number": "PHONE_NUMBER",
+    # "ssn": "US_SSN",
+    "passport": "US_PASSPORT",  # *
+    "driver_license": "US_DRIVER_LICENSE",
+    # "ip_address": "IP_ADDRESS",
+    # "itin": "US_ITIN",
+    # "email": "EMAIL_ADDRESS",
+
+    "organization": "ORG",
+    "company": "ORG",
+    "airline": "ORG",
+
+    # ! todo add back in
+    # "job": "TITLE",
+    # "prefix": "TITLE",
+    # "prefix_male": "TITLE",
+    # "prefix_female": "TITLE",
+    # "gender": "TITLE",
+
+    "imei": "IMEI",
+    "password": "PASSWORD",
+    "license_plate": "US_LICENSE_PLATE",
+    "mac_address": "MAC_ADDRESS",
+    "age": "AGE",
+
+    # ! add back in
+    # "currency_code": "FINANCIAL",
+    # "aba": "FINANCIAL",
+    # "swift": "FINANCIAL",
+
+    "string": "O",
+    "boolean": "O",
+    "color": "O",
+    "random_number": "O",
+    "sha1": "O",
 }
+
+# # mapping to match CONLL and custom entities.
+# PRIVY_PRESIDIO_MODEL = {
+#     # entities presidio performs poorly on
+#     "DATE_TIME": "DATE_TIME",
+#     "US_DRIVER_LICENSE": "US_DRIVER_LICENSE",
+#     "PERSON": "PER",
+#     "US_PASSPORT": "US_PASSPORT",
+#     "NRP": "NRP",
+#     "LOCATION": "LOC",
+
+#     # entities not supported by presidio
+#     "COORDINATE": "LOC",
+#     "TITLE": "TITLE",
+#     "IMEI": "IMEI",
+#     "PASSWORD": "PASSWORD",
+#     "US_LICENSE_PLATE": "US_LICENSE_PLATE",
+#     "MAC_ADDRESS": "MAC_ADDRESS",
+#     "AGE": "AGE",
+#     "FINANCIAL": "FINANCIAL",
+# }
 
 PRIVY_CONLL_TRANSLATOR = {
     "PERSON": "PERSON",
@@ -366,7 +457,7 @@ class InputSample(object):
             "masked": self.masked,
             "spans": [span.__dict__ for span in self.spans],
             "tags": self.tags,
-            # "tokens": self.tokens.to_dict(),
+            "tokens": [t.text for t in self.tokens],
             "template_id": self.template_id,
             "metadata": self.metadata,
         }
