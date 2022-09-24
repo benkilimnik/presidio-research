@@ -176,7 +176,9 @@ class FlairTrainer:
             print(entity)
 
     @staticmethod
-    def train_with_transformers(corpus, add_unk=False, mini_batch_size=1, embeddings="xlm-roberta-base"):
+    def train_with_transformers(corpus, add_unk=False, mini_batch_size=1, embeddings="roberta-base"):
+        # xlm-roberta-base is the multilingual version of roberta-base
+        # roberta-large is the large version of roberta-base
         """
         Train a Flair model
         :param corpus: Corpus object

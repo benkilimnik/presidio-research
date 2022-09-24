@@ -14,7 +14,7 @@ from os import path
 
 setup(
     name="presidio-evaluator",
-    version="0.0.47",
+    version="0.0.48",
     packages=find_packages(exclude=["tests"]),
     url="https://www.github.com/microsoft/presidio-research",
     license="MIT",
