@@ -21,6 +21,8 @@ except ImportError:
     print("Flair is not installed")
 
 from presidio_evaluator import InputSample
+from flair.optim import LinearSchedulerWithWarmup
+import torch
 
 from os import path
 
@@ -111,7 +113,7 @@ class FlairTrainer:
         return corpus
 
     @staticmethod
-    def train_with_flair_embeddings(corpus, add_unk=False):
+    def train_with_flair_embeddings(corpus, add_unk=False, checkpoint="", fast=False):
         """
         Train a Flair model
         :param corpus: Corpus object
@@ -132,11 +134,18 @@ class FlairTrainer:
         print("Tag dictionary: ", tag_dictionary)
 
         # 4. initialize embeddings
-        embedding_types: List[TokenEmbeddings] = [
-            WordEmbeddings("glove"),
-            FlairEmbeddings("news-forward"),
-            FlairEmbeddings("news-backward"),
-        ]
+        if fast:
+            embedding_types: List[TokenEmbeddings] = [
+                WordEmbeddings("glove"),
+                FlairEmbeddings("news-forward-fast"),
+                FlairEmbeddings("news-backward-fast"),
+            ]
+        else:
+            embedding_types: List[TokenEmbeddings] = [
+                WordEmbeddings("glove"),
+                FlairEmbeddings("news-forward"),
+                FlairEmbeddings("news-backward"),
+            ]
 
         embeddings: StackedEmbeddings = StackedEmbeddings(embeddings=embedding_types)
 
@@ -151,15 +160,25 @@ class FlairTrainer:
 
         # 6. initialize trainer
         trainer = ModelTrainer(tagger, corpus)
-
-        # trainer = ModelTrainer.load_checkpoint(checkpoint, corpus)
-        trainer.train(
-            "resources/taggers/privy-flert-ner",
-            learning_rate=0.1,
-            mini_batch_size=32,
-            max_epochs=150,
-            checkpoint=True,
-        )
+        if checkpoint:
+            path = "resources/taggers/privy-flert-ner/checkpoint.pt"
+            if fast:
+                path = "resources/taggers/privy-flert-ner-fast/checkpoint.pt"
+            trained_model = SequenceTagger.load(path)
+            trainer.resume(
+                model=trained_model,
+            )
+        else:
+            path = "resources/taggers/privy-flert-ner"
+            if fast:
+                path = "resources/taggers/privy-flert-ner-fast"
+            trainer.train(
+                path,
+                learning_rate=0.1,
+                mini_batch_size=32,
+                max_epochs=150,
+                checkpoint=True,
+            )
 
         sentence = Sentence("I am from Jerusalem")
         # run NER over sentence
@@ -173,7 +192,7 @@ class FlairTrainer:
             print(entity)
 
     @staticmethod
-    def train_with_transformers(corpus, add_unk=False, mini_batch_size=1, embeddings="roberta-base"):
+    def train_with_transformers(corpus, add_unk=False, mini_batch_size=1, embeddings="roberta-base", checkpoint="", max_epochs=20):
         # xlm-roberta-base is the multilingual version of roberta-base
         # roberta-large is the large version of roberta-base
         """
@@ -218,18 +237,36 @@ class FlairTrainer:
         # 6. initialize trainer
         trainer: ModelTrainer = ModelTrainer(tagger, corpus)
 
+        if checkpoint:
+            trained_model = SequenceTagger.load(
+                "resources/taggers/privy-flair-transformers/checkpoint.pt")
+            trainer.resume(
+                model=trained_model,
+                # learning_rate=5.0e-6,
+                # mini_batch_size=mini_batch_size,
+                # max_epochs=20,
+                # optimizer=torch.optim.AdamW,
+                # scheduler=LinearSchedulerWithWarmup,
+                # warmup_fraction=0.1,
+                # use_final_model_for_eval=True,
+                # decoder_lr_factor=1.0,
+                # mini_batch_chunk_size=1,  # remove this parameter to speed up computation if you have a big GPU
+                # checkpoint=True,
+            )
+
         # from torch.optim.lr_scheduler import OneCycleLR
 
         # 7. run fine-tuning
-        trainer.fine_tune('resources/taggers/privy-flair-transformers',
-                          learning_rate=5.0e-6,
-                          mini_batch_size=mini_batch_size,
-                          max_epochs=20,
-                          #   scheduler=OneCycleLR,
-                          mini_batch_chunk_size=1,  # remove this parameter to speed up computation if you have a big GPU
-                          #   weight_decay=0.,
-                          checkpoint=True,
-                          )
+        else:
+            trainer.fine_tune('resources/taggers/privy-flair-transformers',
+                              learning_rate=5.0e-6,
+                              mini_batch_size=mini_batch_size,
+                              max_epochs=max_epochs,
+                              #   scheduler=OneCycleLR,
+                              mini_batch_chunk_size=1,  # remove this parameter to speed up computation if you have a big GPU
+                              #   weight_decay=0.,
+                              checkpoint=True,
+                              )
 
         sentence = Sentence("I am from Jerusalem")
         # run NER over sentence
