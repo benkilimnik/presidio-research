@@ -161,17 +161,19 @@ class FlairTrainer:
         # 6. initialize trainer
         trainer = ModelTrainer(tagger, corpus)
         if checkpoint:
-            path = "resources/taggers/privy-flert-ner/checkpoint.pt"
             if fast:
                 path = "resources/taggers/privy-flert-ner-fast/checkpoint.pt"
+            else:
+                path = "resources/taggers/privy-flert-ner/checkpoint.pt"
             trained_model = SequenceTagger.load(path)
             trainer.resume(
                 model=trained_model,
             )
         else:
-            path = "resources/taggers/privy-flert-ner"
             if fast:
                 path = "resources/taggers/privy-flert-ner-fast"
+            else:
+                path = "resources/taggers/privy-flert-ner"
             trainer.train(
                 path,
                 learning_rate=0.1,

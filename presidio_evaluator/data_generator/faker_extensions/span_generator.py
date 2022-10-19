@@ -11,7 +11,7 @@ from presidio_evaluator.data_generator.faker_extensions import (
 _re_token = re.compile(r"\{\{\s*(\w+)(:\s*\w+?)?\s*\}\}")
 
 
-class SpanGenerator(Generator):
+class SpanGenerator(Faker):
     """Generator which also returns the indices of fake values.
 
     :example:
@@ -29,6 +29,9 @@ class SpanGenerator(Generator):
     >>>str(res)
         "My child's name is Daniel Gallagher"
     """
+    def __init__(self, locale="en_US", **kwargs):
+        # call init of Faker, passing given locale
+        super().__init__(locale=locale, **kwargs)
 
     def parse(
         self, text: str, add_spans: bool = False, template_id: Optional[int] = None
