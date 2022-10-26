@@ -1,4 +1,4 @@
-# Presidio-research
+# Fork of Presidio-research, modifying some utility functions
 
 This package features data-science related tasks for developing new recognizers for 
 [Presidio](https://github.com/microsoft/presidio).

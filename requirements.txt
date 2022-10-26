@@ -7,6 +7,9 @@ haikunator>=2.1.0
 schwifty
 faker>=9.6.0
 scikit_learn
+plotly
+kaleido
+wordcloud
 #flair
 #stanza
 #spacy_stanza

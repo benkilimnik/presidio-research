@@ -2,14 +2,32 @@ from typing import List, Optional
 
 import spacy
 from spacy.tokens import Doc
+from spacy.symbols import ORTH
 
 loaded_spacy = {}
 
 
 def get_spacy(loaded_spacy=loaded_spacy, model_version="en_core_web_sm"):
+    # add custom rules to spacy tokenizer to break down html, xml, sql into single tokens
     if model_version not in loaded_spacy:
         print("loading model {}".format(model_version))
-        loaded_spacy[model_version] = spacy.load(model_version)
+        nlp = spacy.load(model_version)
+        # split on these additional characters =' is for sql queries, < and > for html, xml)
+        infixes = nlp.Defaults.infixes + [r'([><(=\'),"])']
+        nlp.tokenizer.infix_finditer = spacy.util.compile_infix_regex(infixes).finditer
+
+        for tagName in "html body i br p".split():
+            nlp.tokenizer.add_special_case(f"<{tagName}>", [{ORTH: f"<{tagName}>"}])
+            nlp.tokenizer.add_special_case(f"</{tagName}>", [{ORTH: f"</{tagName}>"}])
+
+        for tagName in "br p".split():
+            nlp.tokenizer.add_special_case(f"<{tagName}/>", [{ORTH: f"<{tagName}/>"}])
+
+        for tagName in "html body i br p".split():
+            nlp.tokenizer.add_special_case(f"<{tagName}>", [{ORTH: f"<{tagName}>"}])
+            nlp.tokenizer.add_special_case(f"</{tagName}>", [{ORTH: f"</{tagName}>"}])
+
+        loaded_spacy[model_version] = nlp
     return loaded_spacy[model_version]
 
 
@@ -176,7 +194,6 @@ def io_to_scheme(io_tags: List[str], scheme: str) -> List[str]:
     if scheme == "BILOU":
         scheme = "BILUO"
 
-
     current_tag = ""
     span_index = 0
     changes = []
@@ -190,7 +207,7 @@ def io_to_scheme(io_tags: List[str], scheme: str) -> List[str]:
     for i in range(len(changes) - 1):
         new_return_tags.extend(
             _get_detailed_tags_for_span(
-                scheme=scheme, cur_tags=io_tags[changes[i] : changes[i + 1]]
+                scheme=scheme, cur_tags=io_tags[changes[i]: changes[i + 1]]
             )
         )
     return new_return_tags

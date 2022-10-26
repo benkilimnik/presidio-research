@@ -12,6 +12,8 @@ from faker.providers import BaseProvider
 from pandas import DataFrame
 from tqdm import tqdm
 
+
+from presidio_evaluator.data_generator.faker_extensions.span_generator import SpanFaker
 from presidio_evaluator.data_generator.faker_extensions import (
     FakerSpansResult,
     NationalityProvider,
@@ -106,6 +108,8 @@ class PresidioDataGenerator:
                 fake_pattern = self.faker.parse(
                     template, add_spans=add_spans, template_id=template_id
                 )
+            elif isinstance(self.faker, SpanFaker):
+                fake_pattern = self.faker.parse(template, template_id=template_id)
             else:
                 fake_pattern = self.faker.parse(template)
             if random.random() < self.lower_case_ratio:

@@ -7,7 +7,9 @@ import spacy
 from spacy import Language
 from spacy.tokens import Doc, DocBin
 from spacy.training import iob_to_biluo
+from spacy.symbols import ORTH
 from tqdm import tqdm
+from collections import Counter
 
 from presidio_evaluator import span_to_tag, tokenize
 from presidio_evaluator.data_generator.faker_extensions import (
@@ -15,6 +17,243 @@ from presidio_evaluator.data_generator.faker_extensions import (
     FakerSpan,
 )
 
+PRIVY_ENTITIES = {
+    "person": "PERSON",
+    "name_male": "PERSON",
+    "name_female": "PERSON",
+    "first_name": "PERSON",
+    "first_name_male": "PERSON",
+    "first_name_female": "PERSON",
+    "first_name_nonbinary": "PERSON",
+    "last_name": "PERSON",
+    "last_name_male": "PERSON",
+    "last_name_female": "PERSON",
+
+    "address": "LOCATION",
+    "street_address": "LOCATION",
+    "secondary_address": "LOCATION",
+    "zipcode": "LOCATION",
+    "building_number": "LOCATION",
+    "street_name": "LOCATION",
+    "airport_name": "LOCATION",
+    "airport_iata": "LOCATION",  # *
+    "airport_icao": "LOCATION",  # *
+
+    "country": "LOCATION",
+    "country_code": "LOCATION",
+    "state": "LOCATION",
+    "state_abbr": "LOCATION",
+    "city": "LOCATION",
+
+    "coordinate": "COORDINATE",  # **
+    "longitude": "COORDINATE",  # **
+    "latitude": "COORDINATE",  # **
+
+    "nationality": "NRP",
+    "nation_woman": "NRP",
+    "nation_man": "NRP",
+    "nation_plural": "NRP",
+    "religion": "NRP",
+
+    "date": "DATE_TIME",
+    "date_time": "DATE_TIME",
+    "date_of_birth": "DATE_TIME",
+    "day_of_week": "DATE_TIME",
+    "year": "DATE_TIME",
+    "month": "DATE_TIME",
+
+    "url": "URL",
+    "domain_name": "URL",
+
+    "credit_card_number": "CREDIT_CARD",
+    "credit_card_expire": "DATE_TIME",
+
+    "iban": "IBAN_CODE",
+    "bban": "US_BANK_NUMBER",  # *
+    "phone_number": "PHONE_NUMBER",
+    "ssn": "US_SSN",
+    "passport": "US_PASSPORT",  # *
+    "driver_license": "US_DRIVER_LICENSE",
+    "ip_address": "IP_ADDRESS",
+    "itin": "US_ITIN",
+    "email": "EMAIL_ADDRESS",
+
+    "organization": "ORGANIZATION",
+    "company": "ORGANIZATION",
+    "airline": "ORGANIZATION",
+
+    "job": "TITLE",
+    "prefix": "TITLE",
+    "prefix_male": "TITLE",
+    "prefix_female": "TITLE",
+    "gender": "TITLE",
+
+    "imei": "IMEI",
+    "password": "PASSWORD",
+    "license_plate": "US_LICENSE_PLATE",
+    "mac_address": "MAC_ADDRESS",
+    "age": "AGE",
+
+    "currency_code": "FINANCIAL",
+    "aba": "FINANCIAL",
+    "swift": "FINANCIAL",
+
+    "string": "O",
+    "boolean": "O",
+    "color": "O",
+    "random_number": "O",
+    "sha1": "O",
+}
+
+PRIVY_PRESIDIO_MODEL = {
+    "person": "PER",
+    "name_male": "PER",
+    "name_female": "PER",
+    "first_name": "PER",
+    "first_name_male": "PER",
+    "first_name_female": "PER",
+    "first_name_nonbinary": "PER",
+    "last_name": "PER",
+    "last_name_male": "PER",
+    "last_name_female": "PER",
+
+    "address": "LOC",
+    "street_address": "LOC",
+    "secondary_address": "LOC",
+    "zipcode": "LOC",
+    "building_number": "LOC",
+    "street_name": "LOC",
+    "airport_name": "LOC",
+    "airport_iata": "LOC",  # *
+    "airport_icao": "LOC",  # *
+
+    "country": "LOC",
+    "country_code": "LOC",
+    "state": "LOC",
+    "state_abbr": "LOC",
+    "city": "LOC",
+
+    "coordinate": "LOC",  # **
+    "longitude": "LOC",  # **
+    "latitude": "LOC",  # **
+
+    "nationality": "NRP",
+    "nation_woman": "NRP",
+    "nation_man": "NRP",
+    "nation_plural": "NRP",
+    "religion": "NRP",
+
+    "date": "DATE_TIME",
+    "date_time": "DATE_TIME",
+    "date_of_birth": "DATE_TIME",
+    "day_of_week": "DATE_TIME",
+    "year": "DATE_TIME",
+    "month": "DATE_TIME",
+
+    "url": "O",
+    "domain_name": "O",
+
+    "credit_card_number": "CREDIT_CARD",
+    "credit_card_expire": "DATE_TIME",
+
+    "iban": "O",
+    "bban": "US_BANK_NUMBER",  # *
+    "phone_number": "O",
+    "ssn": "O",
+    "passport": "US_PASSPORT",  # *
+    "driver_license": "US_DRIVER_LICENSE",
+    "ip_address": "O",
+    "itin": "US_ITIN",
+    "email": "O",
+
+    "organization": "ORG",
+    "company": "ORG",
+    "airline": "ORG",
+
+    "job": "TITLE",
+    "prefix": "TITLE",
+    "prefix_male": "TITLE",
+    "prefix_female": "TITLE",
+    "gender": "TITLE",
+
+    "imei": "IMEI",
+    "password": "PASSWORD",
+    "license_plate": "US_LICENSE_PLATE",
+    "mac_address": "MAC_ADDRESS",
+    "age": "AGE",
+
+    "currency_code": "FINANCIAL",
+    "aba": "FINANCIAL",
+    "swift": "FINANCIAL",
+
+    "string": "O",
+    "boolean": "O",
+    "color": "O",
+    "random_number": "O",
+    "sha1": "O",
+}
+
+# # mapping to match CONLL and custom entities.
+# PRIVY_PRESIDIO_MODEL = {
+#     # entities presidio performs poorly on
+#     "DATE_TIME": "DATE_TIME",
+#     "US_DRIVER_LICENSE": "US_DRIVER_LICENSE",
+#     "PERSON": "PER",
+#     "US_PASSPORT": "US_PASSPORT",
+#     "NRP": "NRP",
+#     "LOCATION": "LOC",
+
+#     # entities not supported by presidio
+#     "COORDINATE": "LOC",
+#     "TITLE": "TITLE",
+#     "IMEI": "IMEI",
+#     "PASSWORD": "PASSWORD",
+#     "US_LICENSE_PLATE": "US_LICENSE_PLATE",
+#     "MAC_ADDRESS": "MAC_ADDRESS",
+#     "AGE": "AGE",
+#     "FINANCIAL": "FINANCIAL",
+# }
+
+PRIVY_CONLL_TRANSLATOR = {
+    "PERSON": "PERSON",
+    "LOCATION": "LOC",
+    "ORGANIZATION": "ORG",
+    # "NRP": "MISC",
+    # "GPE": "LOC",
+}
+
+PRIVY_ONTONOTES_TRANSLATOR = {
+    "PERSON": "PERSON",
+    "NRP": "NORP",
+    # "STREET_ADDRESS": "FAC",
+    # "LOCATION": "FAC",
+    "GPE": "GPE",
+    "DATE_TIME": "DATE",
+    "ORGANIZATION": "ORG",
+}
+
+PRIVY_PRESIDIO_TRANSLATOR = {
+    "PERSON": "PERSON",
+    "NRP": "NRP",
+    "STREET_ADDRESS": "LOCATION",
+    "LOCATION": "LOCATION",
+    "GPE": "LOCATION",
+    "DATE_TIME": "DATE_TIME",
+    "CREDIT_CARD": "CREDIT_CARD",
+    "URL": "URL",
+    "DOMAIN_NAME": "URL",
+    "IBAN_CODE": "IBAN_CODE",
+    # "US_BANK_NUMBER": "US_BANK_NUMBER", # not supported somehow
+    "PHONE_NUMBER": "PHONE_NUMBER",
+    "US_SSN": "US_SSN",
+    "US_PASSPORT": "US_PASSPORT",
+    "US_DRIVER_LICENSE": "US_DRIVER_LICENSE",
+    "IP_ADDRESS": "IP_ADDRESS",
+    "EMAIL_ADDRESS": "EMAIL_ADDRESS",
+    "ORGANIZATION": "ORGANIZATION",
+}
+
+# old
 SPACY_PRESIDIO_ENTITIES = {
     "ORG": "ORGANIZATION",
     "NORP": "NRP",
@@ -27,6 +266,7 @@ SPACY_PRESIDIO_ENTITIES = {
     "DATE": "DATE_TIME",
     "TIME": "DATE_TIME",
 }
+
 PRESIDIO_SPACY_ENTITIES = {
     "PERSON": "PERSON",
     "LOCATION": "LOC",
@@ -214,6 +454,8 @@ class InputSample(object):
             "full_text": self.full_text,
             "masked": self.masked,
             "spans": [span.__dict__ for span in self.spans],
+            "tags": self.tags,
+            "tokens": [t.text for t in self.tokens],
             "template_id": self.template_id,
             "metadata": self.metadata,
         }
@@ -253,7 +495,7 @@ class InputSample(object):
         for i, token in enumerate(self.tokens):
             if translate_tags:
                 label = self.translate_tag(
-                    self.tags[i], PRESIDIO_SPACY_ENTITIES, ignore_unknown=True
+                    self.tags[i], PRIVY_ENTITIES, ignore_unknown=True
                 )
             else:
                 label = self.tags[i]
@@ -277,6 +519,7 @@ class InputSample(object):
     def create_conll_dataset(
         dataset: Union[List["InputSample"], List[FakerSpansResult]],
         translate_tags=False,
+        # translator=PRIVY_ENTITIES,
         to_bio=True,
         token_model_version="en_core_web_sm"
     ) -> pd.DataFrame:
@@ -369,6 +612,27 @@ class InputSample(object):
         )
 
     @staticmethod
+    def get_spacy(model_version="en_core_web_sm"):
+        # add custom rules to spacy tokenizer to break down html, xml, sql into single tokens
+        print("loading model {}".format(model_version))
+        nlp = spacy.load(model_version)
+        # split on these additional characters =' is for sql queries, < and > for html, xml)
+        infixes = nlp.Defaults.infixes + [r'([><(=\'),"])']
+        nlp.tokenizer.infix_finditer = spacy.util.compile_infix_regex(infixes).finditer
+
+        for tagName in "html body i br p".split():
+            nlp.tokenizer.add_special_case(f"<{tagName}>", [{ORTH: f"<{tagName}>"}])
+            nlp.tokenizer.add_special_case(f"</{tagName}>", [{ORTH: f"</{tagName}>"}])
+
+        for tagName in "br p".split():
+            nlp.tokenizer.add_special_case(f"<{tagName}/>", [{ORTH: f"<{tagName}/>"}])
+
+        for tagName in "html body i br p".split():
+            nlp.tokenizer.add_special_case(f"<{tagName}>", [{ORTH: f"<{tagName}>"}])
+            nlp.tokenizer.add_special_case(f"</{tagName}>", [{ORTH: f"</{tagName}>"}])
+        return nlp
+
+    @staticmethod
     def create_spacy_dataset(
         dataset: List["InputSample"],
         output_path: Optional[str] = None,
@@ -401,7 +665,7 @@ class InputSample(object):
             dataset.sort(key=template_sort)
 
         if not spacy_pipeline:
-            spacy_pipeline = spacy.load("en_core_web_sm")
+            spacy_pipeline = InputSample.get_spacy()
 
         spacy_dataset = [
             sample.to_spacy(entities=entities, translate_tags=translate_tags)
@@ -570,3 +834,41 @@ class InputSample(object):
         ]
 
         return input_samples
+
+    @classmethod
+    def convert_faker_spans(cls, fake_records: List[FakerSpansResult]) -> List["InputSample"]:
+        """tokenize and transform fake samples to list of InputSample objects (data structure in presidio)"""
+        input_samples = [
+            # InputSample.from_faker_spans_result(faker_spans_result=fake_record)
+            InputSample.from_faker_spans_result(
+                fake_record, create_tags_from_span=True, scheme="BILUO", token_model_version="en_core_web_sm"
+            )
+            for fake_record in tqdm(fake_records)
+        ]
+        return input_samples
+
+    @classmethod
+    def count_entities(cls, input_samples: List["InputSample"]) -> Counter:
+        count_per_entity_new = Counter()
+        for record in input_samples:
+            for span in record.spans:
+                count_per_entity_new[span.entity_type] += 1
+        return count_per_entity_new.most_common()
+
+    @classmethod
+    def remove_unsupported_entities(cls, dataset: List["InputSample"], entity_mapping: Dict[str, str]) -> None:
+        """Remove records with unsupported entities using passed in entity mapping translator."""
+        filtered_records = []
+        excluded_entities = set()
+
+        for sample in dataset:
+            supported = True
+            for span in sample.spans:
+                if not span.entity_type in entity_mapping.keys():
+                    supported = False
+                    if span.entity_type not in excluded_entities:
+                        print(f"Filtering out unsupported entity {span.entity_type}")
+                    excluded_entities.add(span.entity_type)
+            if supported:
+                filtered_records.append(sample)
+        return filtered_records

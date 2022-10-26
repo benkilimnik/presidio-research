@@ -4,6 +4,7 @@ import spacy
 
 from presidio_evaluator import InputSample
 from presidio_evaluator.data_objects import PRESIDIO_SPACY_ENTITIES
+from presidio_evaluator.data_objects import PRIVY_ONTONOTES_TRANSLATOR
 from presidio_evaluator.models import BaseModel
 
 
