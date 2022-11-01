@@ -16,6 +16,9 @@ setup(
     name="presidio-evaluator",
     version="0.0.61",
     packages=find_packages(exclude=["tests"]),
+    # package_data={"presidio_evaluator": [
+    #     "data_generator/faker_extensions/*.csv", "data_generator/faker_extensions/*.yaml"]},
+    package_data={"": ["*.csv", "*.yaml"]},
     url="https://www.github.com/microsoft/presidio-research",
     license="MIT",
     description="PII dataset generator, model evaluator for Presidio and PII data in general",  # noqa
