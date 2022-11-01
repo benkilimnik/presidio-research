@@ -14,26 +14,18 @@ from os import path
 
 setup(
     name="presidio-evaluator",
-    version="0.0.61",
+    version="0.0.62",
     packages=find_packages(exclude=["tests"]),
-    # package_data={"presidio_evaluator": [
-    #     "data_generator/faker_extensions/*.csv", "data_generator/faker_extensions/*.yaml"]},
-    package_data={"": ["*.csv", "*.yaml"]},
     url="https://www.github.com/microsoft/presidio-research",
     license="MIT",
     description="PII dataset generator, model evaluator for Presidio and PII data in general",  # noqa
-    data_files=[
-        (
-            "presidio_evaluator/data_generator/raw_data",
+    package_data={
+            "presidio_evaluator":
             [
-                "presidio_evaluator/data_generator/raw_data/FakeNameGenerator.com_3000.csv",  # noqa
-                "presidio_evaluator/data_generator/raw_data/templates.txt",
-                "presidio_evaluator/data_generator/raw_data/organizations.csv",
-                "presidio_evaluator/data_generator/raw_data/nationalities.csv",
-                "presidio_evaluator/data_generator/raw_data/us_driver_licenses.csv",
+                "data_generator/raw_data/*.csv",
+                "data_generator/raw_data/*.yaml",
             ],
-        )
-    ],
+        },
     include_package_data=True,
     install_requires=[
         "presidio_analyzer",
