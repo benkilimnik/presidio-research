@@ -1,5 +1,8 @@
 # Fork of Presidio-research, modifying some utility functions
 
+Used in synthetic PII generator for structured data [Privy](https://github.com/pixie-io/pixie/tree/main/src/datagen/pii/privy)
+See [this blog post](https://blog.px.dev/detect-pii/) for details
+
 This package features data-science related tasks for developing new recognizers for 
 [Presidio](https://github.com/microsoft/presidio).
 It is used for the evaluation of the entire system, 
